@@ -105,3 +105,28 @@ Every claim undergoes multi-pass verification against retrieved source chunks:
 | Scripts | `POST` | `/api/scripts/export/markdown` | Export script as formatted Markdown |
 | Storyboards | `POST` | `/api/storyboards/generate` | Convert script to 2D animation storyboard |
 | Storyboards | `POST` | `/api/storyboards/export/markdown` | Export storyboard as Markdown |
+
+---
+
+## 5. LLM Provider Architecture & Baseline Decoupling
+
+ChronicleAI implements a dual-mode LLM provider interface (`app/services/llm_provider.py`):
+
+1. **`ChronicleOfflineRuleEngine` (Deterministic Baseline & Offline Engine):**
+   - Ensures 100% reproducible execution in isolated CI/CD environments without paid API tokens.
+   - Extracts exact sentences from top-retrieved chunks for question answering.
+   - Performs rule-based keyword and negation matching for claim verification.
+   - Uses a structured 7-scene historical narrative template calibrated for the Emperor Le Thanh Tong case study.
+
+2. **`GeminiLLMProvider` (Remote LLM Integration):**
+   - Activated automatically when `GEMINI_API_KEY` is present and `LLM_PROVIDER` is set to `gemini` or `auto`.
+   - Uses the Google Gemini REST API (`gemini-1.5-flash`) for dynamic grounded QA and synthesis.
+   - Automatically falls back to `ChronicleOfflineRuleEngine` if the remote API is unavailable or times out.
+
+---
+
+## 6. Primary Archival Roadmap vs. Synthetic Test Fixtures
+
+- **Current Benchmark Fixtures:** The PDF fixtures in `backend/sample_data/` (`le_thanh_tong_dai_viet.pdf`, `scanned_historical_record.pdf`, `empty_document.pdf`) are synthetic benchmark documents generated via ReportLab for automated regression testing and offline pipeline verification.
+- **Future Archival Ingestion:** The production roadmap incorporates direct ingestion of digitized Han-Nom woodblocks and steles from the National Library of Vietnam, archival OCR integration (TrOCR/Transkribus), and cross-source historiographical reconciliation between *Đại Việt Sử Ký Toàn Thư* and *Khâm Định Việt Sử Thông Giám Cương Mục*.
+

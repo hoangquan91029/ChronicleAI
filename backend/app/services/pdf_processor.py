@@ -1,6 +1,8 @@
 import re
-import uuid
-from typing import List, Tuple, Optional
+import hashlib
+import unicodedata
+from pathlib import Path
+from typing import List, Tuple, Optional, Union
 import pymupdf
 
 from app.config import settings
@@ -24,6 +26,13 @@ class PDFProcessor:
         min_chunk_chars: int = settings.MIN_CHUNK_CHARS,
         scanned_char_threshold: int = settings.SCANNED_THRESHOLD_CHARS_PER_PAGE,
     ):
+        if chunk_size <= 0:
+            raise ValueError("chunk_size must be positive")
+        if chunk_overlap < 0:
+            raise ValueError("chunk_overlap cannot be negative")
+        if chunk_overlap >= chunk_size:
+            raise ValueError("chunk_overlap must be strictly less than chunk_size")
+
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
         self.min_chunk_chars = min_chunk_chars
@@ -40,10 +49,16 @@ class PDFProcessor:
         preserve exact page numbers, split into retrieval-friendly chunks, and return
         a structured DocumentIngestResponse.
         """
+        if isinstance(pdf_bytes, (str, Path)):
+            with open(pdf_bytes, "rb") as f:
+                pdf_bytes = f.read()
+
         if not pdf_bytes:
             raise PDFProcessingError(f"Uploaded file '{filename}' is empty (0 bytes).")
 
-        doc_id = document_id or f"doc_{uuid.uuid4().hex[:8]}"
+        # Stable, deterministic document_id based on file content hash if not provided
+        content_hash = hashlib.sha256(pdf_bytes).hexdigest()[:8]
+        doc_id = document_id or f"doc_{content_hash}"
 
         try:
             doc = pymupdf.open(stream=pdf_bytes, filetype="pdf")
@@ -165,14 +180,19 @@ class PDFProcessor:
         )
 
     def _clean_text(self, text: str) -> str:
-        """Normalize whitespaces, tabs, and linebreaks while keeping Vietnamese diacritics."""
+        """
+        Normalize whitespaces, tabs, and linebreaks while keeping Vietnamese diacritics.
+        Applies Unicode Normalization Form C (NFC).
+        """
         if not text:
             return ""
+        # Unicode Normalization Form C
+        text = unicodedata.normalize("NFC", text)
         # Replace carriage returns
         text = text.replace("\r\n", "\n").replace("\r", "\n")
-        # Normalize continuous spaces/tabs within lines
+        # Normalize continuous horizontal spaces/tabs
         text = re.sub(r"[ \t]+", " ", text)
-        # Collapse excessive newlines (keep paragraph breaks)
+        # Collapse excessive newlines (preserve double newline paragraph breaks)
         text = re.sub(r"\n{3,}", "\n\n", text)
         return text.strip()
 
@@ -187,13 +207,16 @@ class PDFProcessor:
         """
         Split a single page's text into retrieval-friendly chunks using sliding window
         and natural paragraph/sentence boundaries, strictly keeping the exact page number.
+        Guarantees no missing text and handles oversized sentences.
         """
-        chunks: List[ChunkMetadata] = []
-        
+        text = text.strip()
+        if not text:
+            return []
+
         # If the page text is already within chunk size, return it as a single chunk
         if len(text) <= self.chunk_size:
             chunk_idx = start_index + 1
-            chunks.append(
+            return [
                 ChunkMetadata(
                     chunk_id=f"{doc_id}_p{page_num:02d}_c{chunk_idx:03d}",
                     page=page_num,
@@ -203,86 +226,105 @@ class PDFProcessor:
                     chunk_index=chunk_idx,
                     word_count=len(text.split())
                 )
-            )
-            return chunks
+            ]
 
-        # Otherwise, split by paragraphs or sliding window
-        paragraphs = text.split("\n\n")
-        current_chunk_parts: List[str] = []
-        current_length = 0
+        # Break text into atomic semantic units (sentences or word-groups if sentence is oversized)
+        paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
+        units: List[str] = []
 
-        for para in paragraphs:
-            para = para.strip()
-            if not para:
-                continue
-
-            # If a single paragraph is larger than chunk_size, split by sentences
-            if len(para) > self.chunk_size:
-                sentences = re.split(r"(?<=[.!?])\s+", para)
-                for sentence in sentences:
-                    sentence = sentence.strip()
-                    if not sentence:
-                        continue
-                    if current_length + len(sentence) + 1 > self.chunk_size and current_chunk_parts:
-                        # Flush current chunk
-                        chunk_str = " ".join(current_chunk_parts)
-                        chunk_idx = start_index + len(chunks) + 1
-                        chunks.append(
-                            ChunkMetadata(
-                                chunk_id=f"{doc_id}_p{page_num:02d}_c{chunk_idx:03d}",
-                                page=page_num,
-                                text=chunk_str,
-                                source=filename,
-                                document_id=doc_id,
-                                chunk_index=chunk_idx,
-                                word_count=len(chunk_str.split())
-                            )
-                        )
-                        # Overlap: keep last part if helpful
-                        if self.chunk_overlap > 0 and len(current_chunk_parts[-1]) <= self.chunk_overlap:
-                            current_chunk_parts = [current_chunk_parts[-1], sentence]
-                            current_length = sum(len(p) for p in current_chunk_parts) + len(current_chunk_parts) - 1
+        for p in paragraphs:
+            # Split paragraph into sentences
+            sentences = re.split(r"(?<=[.!?])\s+", p)
+            for s in sentences:
+                s = s.strip()
+                if not s:
+                    continue
+                if len(s) > self.chunk_size:
+                    # Break oversized sentence by words
+                    words = s.split(" ")
+                    sub_unit: List[str] = []
+                    sub_len = 0
+                    for w in words:
+                        if not w:
+                            continue
+                        if sub_len + len(w) + 1 > self.chunk_size and sub_unit:
+                            units.append(" ".join(sub_unit))
+                            sub_unit = [w]
+                            sub_len = len(w)
                         else:
-                            current_chunk_parts = [sentence]
-                            current_length = len(sentence)
-                    else:
-                        current_chunk_parts.append(sentence)
-                        current_length += len(sentence) + 1
-            else:
-                if current_length + len(para) + 1 > self.chunk_size and current_chunk_parts:
-                    chunk_str = "\n\n".join(current_chunk_parts)
-                    chunk_idx = start_index + len(chunks) + 1
-                    chunks.append(
-                        ChunkMetadata(
-                            chunk_id=f"{doc_id}_p{page_num:02d}_c{chunk_idx:03d}",
-                            page=page_num,
-                            text=chunk_str,
-                            source=filename,
-                            document_id=doc_id,
-                            chunk_index=chunk_idx,
-                            word_count=len(chunk_str.split())
-                        )
-                    )
-                    current_chunk_parts = [para]
-                    current_length = len(para)
+                            sub_unit.append(w)
+                            sub_len += len(w) + 1
+                    if sub_unit:
+                        units.append(" ".join(sub_unit))
                 else:
-                    current_chunk_parts.append(para)
-                    current_length += len(para) + 2
+                    units.append(s)
 
-        # Flush remainder
-        if current_chunk_parts:
-            chunk_str = "\n\n".join(current_chunk_parts).strip()
-            if len(chunk_str) >= self.min_chunk_chars or not chunks:
+        # Assemble units into chunks with overlap
+        chunks: List[ChunkMetadata] = []
+        curr = ""
+
+        for u in units:
+            if not curr:
+                curr = u
+            elif len(curr) + 1 + len(u) <= self.chunk_size:
+                curr = curr + " " + u
+            else:
                 chunk_idx = start_index + len(chunks) + 1
                 chunks.append(
                     ChunkMetadata(
                         chunk_id=f"{doc_id}_p{page_num:02d}_c{chunk_idx:03d}",
                         page=page_num,
-                        text=chunk_str,
+                        text=curr.strip(),
                         source=filename,
                         document_id=doc_id,
                         chunk_index=chunk_idx,
-                        word_count=len(chunk_str.split())
+                        word_count=len(curr.strip().split())
+                    )
+                )
+
+                # Compute word-boundary overlap from tail of curr
+                if self.chunk_overlap > 0:
+                    words = curr.split(" ")
+                    overlap_words: List[str] = []
+                    overlap_len = 0
+                    for w in reversed(words):
+                        if overlap_len + len(w) + 1 <= self.chunk_overlap:
+                            overlap_words.insert(0, w)
+                            overlap_len += len(w) + 1
+                        else:
+                            break
+                    curr = (" ".join(overlap_words) + " " + u).strip() if overlap_words else u
+                else:
+                    curr = u
+
+        # Flush remainder
+        if curr:
+            curr_str = curr.strip()
+            # If the remainder is smaller than min_chunk_chars and we already have chunks on this page,
+            # we can merge it into the previous chunk if it doesn't exceed 1.25x chunk_size
+            if chunks and len(curr_str) < self.min_chunk_chars and (len(chunks[-1].text) + 1 + len(curr_str) <= int(self.chunk_size * 1.25)):
+                prev = chunks[-1]
+                updated_text = prev.text + " " + curr_str
+                chunks[-1] = ChunkMetadata(
+                    chunk_id=prev.chunk_id,
+                    page=prev.page,
+                    text=updated_text,
+                    source=prev.source,
+                    document_id=prev.document_id,
+                    chunk_index=prev.chunk_index,
+                    word_count=len(updated_text.split())
+                )
+            else:
+                chunk_idx = start_index + len(chunks) + 1
+                chunks.append(
+                    ChunkMetadata(
+                        chunk_id=f"{doc_id}_p{page_num:02d}_c{chunk_idx:03d}",
+                        page=page_num,
+                        text=curr_str,
+                        source=filename,
+                        document_id=doc_id,
+                        chunk_index=chunk_idx,
+                        word_count=len(curr_str.split())
                     )
                 )
 

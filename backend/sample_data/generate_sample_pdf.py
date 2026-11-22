@@ -32,9 +32,13 @@ def generate_samples():
     
     font_regular, font_bold = register_unicode_fonts()
     
-    # 1. Main Historical Document: Emperor Le Thanh Tong
+    # 1. Main Historical Document: Emperor Le Thanh Tong (Synthetic Benchmark Fixture)
     hist_pdf_path = target_dir / "le_thanh_tong_dai_viet.pdf"
     c = canvas.Canvas(str(hist_pdf_path), pagesize=letter)
+    c.setTitle("[SYNTHETIC TEST FIXTURE] Đại Việt thời Lê Thánh Tông (1460 - 1497)")
+    c.setSubject("ChronicleAI Automated Testing Benchmark Fixture (Not a primary historical archive)")
+    c.setAuthor("ChronicleAI Test Suite")
+    c.setCreator("ReportLab / ChronicleAI Synthetic Fixture Generator")
     width, height = letter
 
     # Page 1: Lên ngôi & Cải cách hành chính (1460-1471)

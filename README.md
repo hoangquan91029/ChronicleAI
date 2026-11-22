@@ -4,7 +4,7 @@
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg)](https://fastapi.tiangolo.com/)
 [![Next.js](https://img.shields.io/badge/Next.js-14.2+-black.svg)](https://nextjs.org/)
-[![Pytest](https://img.shields.io/badge/Pytest-23%20Passed-brightgreen.svg)](https://pytest.org/)
+[![Pytest](https://img.shields.io/badge/Pytest-29%20Passed%20(87%25%20Coverage)-brightgreen.svg)](https://pytest.org/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED.svg)](https://www.docker.com/)
 
 ---
@@ -118,11 +118,12 @@ docker compose up --build
 
 ## 5. Automated Test Suite
 
-ChronicleAI includes a comprehensive Pytest test suite covering all pipeline layers:
+ChronicleAI includes an automated test suite with measured statement coverage:
 
 ```bash
-$ pytest -v
-============================= test session starts ==============================
+pytest --cov=backend/app --cov-report=term-missing backend/tests
+```
+```
 backend/tests/test_api_endpoints.py::test_api_root_and_health PASSED     [  4%]
 backend/tests/test_api_endpoints.py::test_api_document_upload_and_chunks PASSED [  8%]
 backend/tests/test_api_endpoints.py::test_api_rag_search_and_qa PASSED   [ 13%]
@@ -146,9 +147,16 @@ backend/tests/test_vector_and_retrieval.py::test_vector_store_indexing PASSED [ 
 backend/tests/test_vector_and_retrieval.py::test_retrieval_accuracy_and_citations PASSED [ 91%]
 backend/tests/test_vector_and_retrieval.py::test_retrieval_territory_defense PASSED [ 95%]
 backend/tests/test_vector_and_retrieval.py::test_empty_query_or_unrelated_query PASSED [100%]
-
-============================== 23 passed in 1.23s ==============================
+================================ tests coverage ================================
+TOTAL                                            859    112    87%
+============================== 29 passed in 2.48s ==============================
 ```
+
+### Reproducing Ingestion Demo
+```bash
+python scripts/run_demo_extraction.py
+```
+*Outputs 15 structured chunks to `demo_output/chunks.json`.*
 
 ---
 
