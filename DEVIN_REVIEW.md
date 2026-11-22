@@ -3,7 +3,7 @@
 > **Prepared for:** Cognition / Devin Engineering Evaluation Team  
 > **Project:** ChronicleAI — Open-Source AI Historical Research & Video Production Platform  
 > **Case Study 1:** Emperor Lê Thánh Tông of Đại Việt (1460–1497)  
-> **Repository:** `https://github.com/DevinEvaluator/ChronicleAI`  
+> **Repository:** `https://github.com/hoangquan91029/ChronicleAI`  
 > **Test Status:** 23/23 Automated Tests Passed (100% Coverage of Core Workflows)
 
 ---
@@ -125,7 +125,7 @@ backend/tests/test_vector_and_retrieval.py::test_empty_query_or_unrelated_query 
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/DevinEvaluator/ChronicleAI.git
+   git clone https://github.com/hoangquan91029/ChronicleAI.git
    cd ChronicleAI
    ```
 

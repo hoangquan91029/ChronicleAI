@@ -79,7 +79,7 @@ PDF Ingestion (PyMuPDF)
 
 1. **Clone repository**:
    ```bash
-   git clone https://github.com/DevinEvaluator/ChronicleAI.git
+   git clone https://github.com/hoangquan91029/ChronicleAI.git
    cd ChronicleAI
    ```
 

@@ -54,7 +54,7 @@ export default function Home() {
             </div>
 
             <a
-              href="https://github.com/DevinEvaluator/ChronicleAI"
+              href="https://github.com/hoangquan91029/ChronicleAI"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg border border-slate-200 transition"
