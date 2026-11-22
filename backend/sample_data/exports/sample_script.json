@@ -1,0 +1,192 @@
+{
+  "title": "Đại Việt Thời Hồng Đức: Kỷ Nguyên Hoàng Kim Của Hoàng Đế Lê Thánh Tông (1460 - 1497)",
+  "subject": "Hoàng đế Lê Thánh Tông (1460–1497)",
+  "target_duration_minutes": 19.3,
+  "total_estimated_duration_seconds": 1160,
+  "hook": "Mùa hè năm 1460, một chàng thanh niên 18 tuổi bước lên ngai vàng giữa lúc triều đình Đại Việt vừa rung chuyển sau các cuộc biến loạn cung đình đẫm máu...",
+  "background_summary": "Bối cảnh Đại Việt giữa thế kỷ 15 sau biến loạn cung đình Nghi Dân, đòi hỏi một cuộc cải cách toàn diện từ hành chính, luật pháp, giáo dục tới quốc phòng.",
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "Mở đầu: Vị Hoàng đế Thay đổi Vận mệnh Đại Việt",
+      "scene_type": "HOOK",
+      "estimated_duration_seconds": 120,
+      "historical_setting": "Năm 1460, Hoàng thành Thăng Long, đêm sau cuộc chính biến cung đình",
+      "narration": "Mùa hè năm 1460, một chàng thanh niên 18 tuổi bước lên ngai vàng giữa lúc triều đình Đại Việt vừa rung chuyển sau các cuộc biến loạn cung đình đẫm máu. Ít ai ngờ rằng, chàng thiếu niên ấy — Hoàng đế Lê Thánh Tông — sẽ mở ra triều đại hoàng kim rực rỡ nhất trong một ngàn năm phong kiến Việt Nam. Làm thế nào một vị vua trẻ lại có thể tái thiết toàn bộ đất nước, biến Đại Việt thành cường quốc phương Nam?",
+      "dialogues": [
+        {
+          "speaker": "Người dẫn chuyện",
+          "text": "Hãy cùng ChronicleAI ngược dòng thời gian về thế kỷ 15 để khám phá thời kỳ thịnh trị Hồng Đức.",
+          "dialogue_type": "NARRATION",
+          "is_fictional": false,
+          "citation": null
+        }
+      ],
+      "key_historical_facts": [
+        "Lê Tư Thành đăng cơ năm Canh Thìn (1460), niên hiệu Quang Thuận sau đổi thành Hồng Đức."
+      ],
+      "citations": [],
+      "needs_review": false,
+      "review_notes": null
+    },
+    {
+      "scene_number": 2,
+      "title": "Cuộc Đại Cải Cách Hành Chính: Bãi bỏ Tể Tướng & 13 Đạo Thừa Tuyên",
+      "scene_type": "BACKGROUND",
+      "estimated_duration_seconds": 180,
+      "historical_setting": "Điện Kính Thiên, Hoàng thành Thăng Long (1460 - 1471)",
+      "narration": "Ngay sau khi lên ngôi, Lê Thánh Tông đã nhìn thấu hiểm họa từ nạn đại thần lộng quyền và bộ máy cồng kềnh. Nhà vua đưa ra quyết định táo bạo chưa từng có: Bãi bỏ hoàn toàn các chức vị Tể tướng, Tam công, Tam thiếu, trực tiếp nắm quyền điều hành tối cao. Ở trung ương, vua tái lập Lục Bộ (Lại, Hộ, Lễ, Binh, Hình, Công), được giám sát bởi Lục Khoa. Ở địa phương, 13 Đạo thừa tuyên được thiết lập, chia quyền cho Tam ty: Đô ty (quân sự), Thừa ty (hành chính) và Hiến ty (thanh tra). Đây là hệ thống kiềm chế quyền lực mẫu mực.",
+      "dialogues": [
+        {
+          "speaker": "Vua Lê Thánh Tông",
+          "text": "Triều đình cần người tài chứ không cần kẻ ôm quyền làm loạn. Trẫm muốn mọi mệnh lệnh phải thông suốt từ kinh thành tới từng xóm thôn!",
+          "dialogue_type": "FICTIONAL_DRAMATIZATION",
+          "is_fictional": true,
+          "citation": null
+        }
+      ],
+      "key_historical_facts": [
+        "Bãi bỏ Tể tướng, phân chia quyền lực cho Lục Bộ.",
+        "Thành lập 13 Đạo thừa tuyên với cơ chế Tam ty đối trọng."
+      ],
+      "citations": [],
+      "needs_review": true,
+      "review_notes": "Cảnh thiếu trích dẫn tư liệu gốc trực tiếp — cần chuyên gia sử học đối chiếu."
+    },
+    {
+      "scene_number": 3,
+      "title": "Quốc Triều Hình Luật (Luật Hồng Đức): Bản Tuyên Ngôn Nhân Quyền Tiến Bộ",
+      "scene_type": "KEY_ACHIEVEMENT",
+      "estimated_duration_seconds": 200,
+      "historical_setting": "Nội các Thăng Long, quá trình soạn thảo bộ luật 722 điều",
+      "narration": "Di sản pháp lý vĩ đại nhất của triều Hồng Đức chính là 'Quốc Triều Hình Luật' — thường gọi là Bộ luật Hồng Đức. Với 722 điều luật bao quát toàn bộ đời sống kinh tế - xã hội, đây là công trình pháp luật tiến bộ bậc nhất thời trung đại phương Đông. Đặc biệt, luật bảo vệ quyền bình đẳng của phụ nữ: con gái có quyền thừa kế hương hỏa ngang với con trai, người vợ có quyền ly hôn nếu chồng bỏ rơi ba năm. Bên cạnh đó, chế độ quân điền bảo đảm dân nghèo có ruộng cày, quan lại lơ là đê điều đắp lũ sông Hồng sẽ bị trừng phạt nghiêm khắc.",
+      "dialogues": [
+        {
+          "speaker": "Quan Thượng thư Bộ Hình",
+          "text": "Muôn tâu Hoàng thượng, cho phép nữ giới giữ tài sản riêng khi phân ly chưa từng có tiền lệ ở các triều trước!",
+          "dialogue_type": "FICTIONAL_DRAMATIZATION",
+          "is_fictional": true,
+          "citation": null
+        },
+        {
+          "speaker": "Vua Lê Thánh Tông",
+          "text": "Pháp luật của Trẫm lập ra là để an dân. Dân không ấm no, đạo nghĩa không nghiêm thì lấy gì dựng nước?",
+          "dialogue_type": "FICTIONAL_DRAMATIZATION",
+          "is_fictional": true,
+          "citation": null
+        }
+      ],
+      "key_historical_facts": [
+        "Ban hành Quốc Triều Hình Luật gồm 16 thiên, 722 điều.",
+        "Bảo vệ quyền thừa kế và sở hữu tài sản của phụ nữ.",
+        "Đặt quan Hà đê sứ và Khuyến nông sứ chăm lo dân sinh."
+      ],
+      "citations": [],
+      "needs_review": true,
+      "review_notes": "Cảnh thiếu trích dẫn tư liệu gốc trực tiếp — cần chuyên gia sử học đối chiếu."
+    },
+    {
+      "scene_number": 4,
+      "title": "Hiền Tài Là Nguyên Khí Quốc Gia: Khắc Bia Tiến Sĩ Văn Miếu (1484)",
+      "scene_type": "KEY_ACHIEVEMENT",
+      "estimated_duration_seconds": 180,
+      "historical_setting": "Văn Miếu - Quốc Tử Giám, Hà Nội, năm Giáp Thìn (1484)",
+      "narration": "Lê Thánh Tông thấu hiểu rằng: Quốc gia muốn cường thịnh phải bắt đầu từ việc coi trọng tri thức. Ông chuẩn hóa quy chế thi cử cứ 3 năm tổ chức một kỳ thi Hội nghiêm ngặt. Suốt triều đại ông, 501 tiến sĩ đã được tuyển chọn. Năm 1484, nhà vua đưa ra một quyết định có ý nghĩa thiên niên kỷ: Dựng bia đá trên lưng rùa khắc tên các nhà khoa bảng tại Văn Miếu. Đông các Đại học sĩ Thân Nhân Trung đã phụng mệnh soạn bài văn bia bất hủ tạc sâu vào tâm thức dân tộc.",
+      "dialogues": [
+        {
+          "speaker": "Thân Nhân Trung",
+          "text": "Hiền tài là nguyên khí của quốc gia, nguyên khí thịnh thì thế nước mạnh rồi lên cao, nguyên khí suy thì thế nước yếu rồi xuống thấp.",
+          "dialogue_type": "HISTORICAL_QUOTE",
+          "is_fictional": false,
+          "citation": null
+        }
+      ],
+      "key_historical_facts": [
+        "Dựng bia tiến sĩ Văn Miếu năm 1484.",
+        "Đào tạo 501 tiến sĩ trong triều đại Hồng Đức.",
+        "Văn bia Thân Nhân Trung tôn vinh tri thức."
+      ],
+      "citations": [],
+      "needs_review": true,
+      "review_notes": "Cảnh thiếu trích dẫn tư liệu gốc trực tiếp — cần chuyên gia sử học đối chiếu."
+    },
+    {
+      "scene_number": 5,
+      "title": "Tao Đàn Nhị Thập Bát Tú & Bản Đồ Hồng Đức (1490)",
+      "scene_type": "NARRATIVE",
+      "estimated_duration_seconds": 160,
+      "historical_setting": "Vườn Quỳnh Lâm và điện giảng sách, Thăng Long (1490 - 1495)",
+      "narration": "Không chỉ là nhà chính trị lỗi lạc, Lê Thánh Tông còn là nhà thơ, chủ soái Hội Tao Đàn Nhị Thập Bát Tú quy tụ 28 văn nhân đại thần kiệt xuất. Tác phẩm thơ Nôm 'Hồng Đức quốc âm thi tập' đã khẳng định vị thế độc lập, tự chủ của tiếng mẹ đẻ. Đặc biệt, năm 1490, Hoàng đế ban hành 'Bản đồ Hồng Đức' — bộ tập bản đồ địa lý toàn cảnh đầu tiên của Đại Việt, định hình rõ ranh giới cương vực non sông từ ải Bắc đến dải miền Trung.",
+      "dialogues": [
+        {
+          "speaker": "Vua Lê Thánh Tông",
+          "text": "Văn chương phải rạng rỡ hồn non nước. Bản đồ phải tỏ rõ từng ngọn núi, tấc đất của tổ tông!",
+          "dialogue_type": "FICTIONAL_DRAMATIZATION",
+          "is_fictional": true,
+          "citation": null
+        }
+      ],
+      "key_historical_facts": [
+        "Sáng lập Hội Tao Đàn năm 1495, giữ chức Tao Đàn Đô nguyên súy.",
+        "Hoàn thành Bản đồ Hồng Đức năm Canh Tuất (1490)."
+      ],
+      "citations": [],
+      "needs_review": true,
+      "review_notes": "Cảnh thiếu trích dẫn tư liệu gốc trực tiếp — cần chuyên gia sử học đối chiếu."
+    },
+    {
+      "scene_number": 6,
+      "title": "Bảo Vệ Biên Cương: Lời Dặn 'Một Thước Núi, Một Tấc Sông' (1471 - 1473)",
+      "scene_type": "HISTORICAL_CONFLICT",
+      "estimated_duration_seconds": 190,
+      "historical_setting": "Biên cương Đại Việt và Điện triều nghị, Thăng Long (1471 - 1473)",
+      "narration": "Năm 1471, sau khi đánh bại cuộc xâm lấn quấy nhiễu của vua Chiêm Thành Trà Toàn, vua mở rộng cương vực, lập nên đạo Quảng Nam — đạo thừa tuyên thứ 13. Nhưng điều làm nên tầm vóc bất tử của Lê Thánh Tông chính là ý chí sắt đá bảo vệ chủ quyền biên giới. Tháng 4 năm 1473, khi nghe tin quan lại biên phòng có biểu hiện thỏa hiệp, nhà vua đã truyền lời răn dạy đanh thép được ghi chép trang trọng trong Đại Việt Sử Ký Toàn Thư.",
+      "dialogues": [
+        {
+          "speaker": "Vua Lê Thánh Tông",
+          "text": "Một thước núi, một tấc sông của ta, lẽ nào lại tự tiện vứt bỏ? Ngươi phải kiên quyết tranh biện, chớ cho họ lấn dần. Nếu ngươi dám đem một thước núi, một tấc đất của Thái Tổ làm mồi cho giặc, thì tội phải tru di!",
+          "dialogue_type": "HISTORICAL_QUOTE",
+          "is_fictional": false,
+          "citation": null
+        }
+      ],
+      "key_historical_facts": [
+        "Chiến dịch Nam chinh 1471 thành lập đạo Quảng Nam.",
+        "Lời tuyên ngôn chủ quyền đanh thép năm 1473 ghi trong Đại Việt Sử Ký Toàn Thư."
+      ],
+      "citations": [],
+      "needs_review": true,
+      "review_notes": "Cảnh thiếu trích dẫn tư liệu gốc trực tiếp — cần chuyên gia sử học đối chiếu."
+    },
+    {
+      "scene_number": 7,
+      "title": "Kết Luận: Di Sản Bất Diệt Của Kỷ Nguyên Hồng Đức",
+      "scene_type": "CONCLUSION",
+      "estimated_duration_seconds": 130,
+      "historical_setting": "Toàn cảnh Thăng Long nghìn năm và Văn Miếu Quốc Tử Giám ngày nay",
+      "narration": "38 năm trị vì của Hoàng đế Lê Thánh Tông không chỉ là thời kỳ thịnh trị đỉnh cao của nhà Hậu Lê, mà còn để lại cho hậu thế bài học trường tồn về nhà nước pháp quyền, sự tôn vinh trí thức và tinh thần kiên quyết bảo vệ từng tấc đất thiêng liêng của Tổ quốc. Những viên gạch mà ông đặt xuống vẫn tiếp tục soi sáng con đường phát triển của dân tộc Việt Nam hôm nay.",
+      "dialogues": [
+        {
+          "speaker": "Người dẫn chuyện",
+          "text": "Cảm ơn các bạn đã đồng hành cùng ChronicleAI. Hãy tiếp tục khám phá những trang sử vàng hào hùng của dân tộc!",
+          "dialogue_type": "NARRATION",
+          "is_fictional": false,
+          "citation": null
+        }
+      ],
+      "key_historical_facts": [
+        "Lê Thánh Tông trị vì 38 năm (1460 - 1497), thời kỳ thịnh trị bậc nhất Đại Việt."
+      ],
+      "citations": [],
+      "needs_review": false,
+      "review_notes": null
+    }
+  ],
+  "conclusion": "38 năm trị vì của Hoàng đế Lê Thánh Tông không chỉ là thời kỳ thịnh trị đỉnh cao của nhà Hậu Lê, mà còn để lại cho hậu thế bài học trường tồn về nhà nước pháp quyền và chủ quyền lãnh thổ.",
+  "total_scenes": 7,
+  "verified_claims_count": 0,
+  "flagged_for_review_count": 5,
+  "sources_consulted": [
+    "Đại Việt Sử Ký Toàn Thư (Bản in khảo cứu)"
+  ]
+}
