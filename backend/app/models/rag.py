@@ -15,6 +15,10 @@ class Citation(BaseModel):
     quote: str = Field(default="", description="Relevant excerpt quote supporting the statement")
     score: float = Field(default=0.0, description="Relevance / similarity score")
 
+    @property
+    def source(self) -> str:
+        return self.filename
+
 
 class SearchResult(BaseModel):
     chunk_id: str

@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -22,8 +22,8 @@ class Settings(BaseSettings):
     GEMINI_MODEL: str = "gemini-1.5-flash"
     
     # Embeddings & Chunking
-    CHUNK_SIZE: int = 500  # Characters per chunk
-    CHUNK_OVERLAP: int = 80  # Overlap characters
+    CHUNK_SIZE: int = 900  # Characters per chunk (preserves complete historical paragraph context)
+    CHUNK_OVERLAP: int = 100  # Overlap characters
     MIN_CHUNK_CHARS: int = 50
     SCANNED_THRESHOLD_CHARS_PER_PAGE: int = 30  # If page has < 30 text chars but has images/drawing, flag as scanned
     
@@ -34,7 +34,6 @@ class Settings(BaseSettings):
     # CORS
     CORS_ORIGINS: list[str] = ["*"]
 
-    from pydantic_settings import SettingsConfigDict
     model_config = SettingsConfigDict(env_file=".env", extra="allow")
 
 
