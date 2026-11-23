@@ -1,7 +1,22 @@
 "use client";
 
 import React, { useState } from "react";
-import { Layout, Palette, Clock, Copy, Check, Download, Camera, BookOpen, Sparkles } from "lucide-react";
+import {
+  Layout,
+  Palette,
+  Clock,
+  Copy,
+  Check,
+  Download,
+  Camera,
+  BookOpen,
+  Sparkles,
+  Monitor,
+  Smartphone,
+  Edit3,
+  Video,
+  ShieldCheck
+} from "lucide-react";
 
 interface Citation {
   filename: string;
@@ -30,14 +45,26 @@ interface Storyboard {
   subject: string;
   total_scenes: number;
   total_duration_seconds: number;
+  aspect_ratio: string;
   visual_theme: string;
   scenes: StoryboardScene[];
 }
 
-export default function StoryboardViewer() {
+export default function StoryboardViewer({
+  onNavigateToVideo
+}: {
+  onNavigateToVideo?: () => void;
+}) {
   const [loading, setLoading] = useState(false);
+  const [aspectRatio, setAspectRatio] = useState<"16:9" | "9:16">("16:9");
   const [storyboard, setStoryboard] = useState<Storyboard | null>(null);
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
+
+  // Edit scene state
+  const [editingSceneNum, setEditingSceneNum] = useState<number | null>(null);
+  const [editPrompt, setEditPrompt] = useState("");
+  const [editVisualDesc, setEditVisualDesc] = useState("");
+  const [savingScene, setSavingScene] = useState(false);
 
   const handleGenerateStoryboard = async () => {
     setLoading(true);
@@ -47,6 +74,7 @@ export default function StoryboardViewer() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           subject: "Hoàng đế Lê Thánh Tông (1460–1497)",
+          aspect_ratio: aspectRatio,
           visual_style_preference: "minimalist_2d_stick_figure",
         }),
       });
@@ -58,6 +86,38 @@ export default function StoryboardViewer() {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleStartEdit = (scene: StoryboardScene) => {
+    setEditingSceneNum(scene.scene_number);
+    setEditPrompt(scene.ai_image_prompt);
+    setEditVisualDesc(scene.visual_description);
+  };
+
+  const handleSaveScene = async (sceneNumber: number) => {
+    setSavingScene(true);
+    try {
+      const res = await fetch(`/api/storyboards/scenes/${sceneNumber}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ai_image_prompt: editPrompt,
+          visual_description: editVisualDesc
+        })
+      });
+
+      if (res.ok) {
+        const updated = await res.json();
+        setStoryboard(updated);
+        setEditingSceneNum(null);
+      } else {
+        alert("Lưu phân cảnh storyboard thất bại");
+      }
+    } catch (err) {
+      console.error("Save storyboard scene error:", err);
+    } finally {
+      setSavingScene(false);
     }
   };
 
@@ -98,158 +158,250 @@ export default function StoryboardViewer() {
 
   return (
     <div className="space-y-6">
-      {/* Control Box */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
+      {/* Control Bar */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
           <div>
-            <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
               <Layout className="w-5 h-5 text-amber-600" />
-              Bảng Phân Cảnh Thị Giác (Storyboard Generator)
+              Phân Cảnh Hoạt Họa 2D (Storyboard Generator)
             </h2>
-            <p className="text-sm text-slate-500 mt-0.5">
-              Chuyển hóa kịch bản thành các khung hình hoạt họa 2D tối giản (minimalist stick-figure), góc máy điện ảnh và prompt tạo ảnh AI.
+            <p className="text-xs text-slate-500 mt-0.5">
+              Chuyển hóa kịch bản thành phân cảnh trực quan: Phác họa nhân vật người que 2D tối giản, trang phục thế kỷ 15 và prompt tạo ảnh AI chuẩn hóa.
             </p>
           </div>
 
-          <button
-            onClick={handleGenerateStoryboard}
-            disabled={loading}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-medium text-sm rounded-lg shadow-sm transition disabled:opacity-50"
-          >
-            <Sparkles className="w-4 h-4" />
-            {loading ? "Đang tạo storyboard..." : "Tạo Storyboard 2D"}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleGenerateStoryboard}
+              disabled={loading}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-700 to-amber-600 hover:from-amber-800 hover:to-amber-700 text-white font-semibold text-xs rounded-xl shadow-sm transition disabled:opacity-50"
+            >
+              <Sparkles className="w-4 h-4" />
+              {loading ? "Đang tạo phân cảnh..." : "Tạo Phân Cảnh Mới"}
+            </button>
+          </div>
         </div>
 
-        <div className="p-3.5 bg-amber-50/70 border border-amber-200/80 rounded-lg text-xs text-amber-900 flex items-start gap-2">
-          <Palette className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-          <div>
-            <span className="font-semibold">Phong cách mỹ thuật định hướng: </span>
-            Hoạt họa 2D tối giản Việt Nam (Minimalist 2D Animation), nhân vật hình que (stick-figure) biểu cảm cao, trang phục truyền thống thế kỷ 15 (áo giao lĩnh, khăn đóng), hậu cảnh màu nước cổ điển.
+        {/* Aspect Ratio Selector */}
+        <div className="pt-2 flex flex-col sm:flex-row sm:items-center gap-3">
+          <span className="text-xs font-semibold text-slate-700">Tỷ lệ khung hình Storyboard:</span>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setAspectRatio("16:9")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition ${
+                aspectRatio === "16:9"
+                  ? "bg-amber-50 border-amber-500 text-amber-900 font-bold"
+                  : "border-slate-200 text-slate-600 hover:bg-slate-50"
+              }`}
+            >
+              <Monitor className="w-3.5 h-3.5" />
+              <span>16:9 Khung Ngang (YouTube / TV)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setAspectRatio("9:16")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition ${
+                aspectRatio === "9:16"
+                  ? "bg-amber-50 border-amber-500 text-amber-900 font-bold"
+                  : "border-slate-200 text-slate-600 hover:bg-slate-50"
+              }`}
+            >
+              <Smartphone className="w-3.5 h-3.5" />
+              <span>9:16 Khung Dọc (Shorts / Reels)</span>
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Storyboard Cards */}
+      {/* Storyboard Presentation */}
       {storyboard && (
         <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-            <div>
-              <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">
-                Bảng Phân Cảnh Hoàn Chỉnh
-              </span>
-              <h3 className="text-lg font-bold text-slate-900 mt-0.5">{storyboard.script_title}</h3>
-              <div className="flex items-center gap-3 text-xs text-slate-500 mt-1">
-                <span>{storyboard.total_scenes} Phân cảnh</span>
-                <span>•</span>
-                <span className="flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-slate-400" />
-                  {storyboard.total_duration_seconds} giây
-                </span>
+          {/* Header Summary Card */}
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 pb-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 uppercase">
+                    Tỷ Lệ {storyboard.aspect_ratio || aspectRatio}
+                  </span>
+                  <span className="text-xs text-slate-500 font-medium">
+                    {storyboard.total_scenes} Phân cảnh • {storyboard.total_duration_seconds}s
+                  </span>
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mt-1">
+                  {storyboard.script_title}
+                </h3>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {onNavigateToVideo && (
+                  <button
+                    onClick={onNavigateToVideo}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-amber-700 hover:bg-amber-800 rounded-lg shadow-sm transition"
+                  >
+                    <Video className="w-3.5 h-3.5" />
+                    <span>Dựng Video Này</span>
+                  </button>
+                )}
+                <button
+                  onClick={handleExportMarkdown}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  Markdown
+                </button>
+                <button
+                  onClick={handleExportJson}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  JSON
+                </button>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleExportMarkdown}
-                className="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-medium rounded-lg transition"
-              >
-                <Download className="w-3.5 h-3.5 text-slate-600" />
-                Xuất Markdown
-              </button>
-              <button
-                onClick={handleExportJson}
-                className="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-medium rounded-lg transition"
-              >
-                <Download className="w-3.5 h-3.5 text-slate-600" />
-                Xuất JSON
-              </button>
+            {/* Visual Theme Directive */}
+            <div className="p-4 bg-amber-50/40 rounded-xl border border-amber-200/60 text-xs">
+              <span className="font-bold text-amber-900 uppercase tracking-wider text-[10px] block mb-1">
+                Định Hướng Phong Cách Thị Giác Hoạt Họa (Visual Art Direction):
+              </span>
+              <p className="text-slate-800 leading-relaxed font-serif">
+                "{storyboard.visual_theme}"
+              </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-6">
-            {storyboard.scenes.map((s, idx) => (
-              <div
-                key={s.scene_number}
-                className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4 hover:border-amber-300 transition"
-              >
-                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-100 pb-3">
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-7 h-7 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center">
-                      #{s.scene_number}
-                    </span>
-                    <h4 className="font-semibold text-slate-900 text-base">{s.title}</h4>
-                  </div>
-                  <span className="px-2.5 py-1 bg-amber-100 text-amber-900 rounded font-semibold text-xs self-start">
-                    ⏱️ Thời lượng: {s.estimated_duration_seconds}s
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                  <div className="space-y-2 bg-slate-50 p-4 rounded-lg border border-slate-100">
-                    <span className="font-semibold text-slate-700 block">Bối cảnh lịch sử & Hoạt cảnh:</span>
-                    <p className="text-slate-600 leading-relaxed">{s.visual_description}</p>
-                    <div className="pt-2 flex items-center gap-1.5 text-slate-500">
-                      <Camera className="w-3.5 h-3.5 text-amber-600" />
-                      <span>{s.camera_direction}</span>
+          {/* Scenes Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {storyboard.scenes.map((scene) => {
+              const isEditing = editingSceneNum === scene.scene_number;
+              return (
+                <div
+                  key={scene.scene_number}
+                  className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4 flex flex-col justify-between"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                      <span className="font-bold text-slate-900 text-xs">
+                        Cảnh {scene.scene_number}: {scene.title}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-semibold text-[10px]">
+                          ⏱️ {scene.estimated_duration_seconds}s
+                        </span>
+                        {!isEditing && (
+                          <button
+                            onClick={() => handleStartEdit(scene)}
+                            className="p-1 text-slate-400 hover:text-amber-700 rounded transition"
+                            title="Sửa prompt phân cảnh"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="space-y-2 bg-slate-50 p-4 rounded-lg border border-slate-100">
-                    <span className="font-semibold text-slate-700 block">Lời bình & Thoại:</span>
-                    <p className="text-slate-700 leading-relaxed italic">"{s.narration}"</p>
-                    {s.character_dialogue && (
-                      <p className="text-amber-900 font-medium pt-1">
-                        💬 {s.character_dialogue}
-                      </p>
+                    {isEditing ? (
+                      <div className="p-3 bg-slate-50 rounded-xl border border-amber-300 space-y-2 text-xs">
+                        <div>
+                          <label className="text-[11px] text-slate-500 block mb-1">Mô tả trực quan:</label>
+                          <textarea
+                            rows={2}
+                            value={editVisualDesc}
+                            onChange={(e) => setEditVisualDesc(e.target.value)}
+                            className="w-full p-2 border border-slate-300 rounded text-xs"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[11px] text-slate-500 block mb-1">AI Image Prompt:</label>
+                          <textarea
+                            rows={3}
+                            value={editPrompt}
+                            onChange={(e) => setEditPrompt(e.target.value)}
+                            className="w-full p-2 border border-slate-300 rounded text-xs"
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleSaveScene(scene.scene_number)}
+                            disabled={savingScene}
+                            className="px-3 py-1 bg-amber-600 text-white rounded text-xs font-semibold"
+                          >
+                            {savingScene ? "Lưu..." : "Lưu"}
+                          </button>
+                          <button
+                            onClick={() => setEditingSceneNum(null)}
+                            className="px-3 py-1 border border-slate-300 rounded text-xs text-slate-600"
+                          >
+                            Hủy
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        {/* Setting & Direction */}
+                        <div className="grid grid-cols-2 gap-2 text-[11px]">
+                          <div className="p-2 bg-slate-50 rounded-lg">
+                            <span className="text-slate-500 block">Bối cảnh lịch sử:</span>
+                            <span className="font-semibold text-slate-800">{scene.historical_setting}</span>
+                          </div>
+                          <div className="p-2 bg-slate-50 rounded-lg">
+                            <span className="text-slate-500 block">Góc máy:</span>
+                            <span className="font-semibold text-slate-800">{scene.camera_direction}</span>
+                          </div>
+                        </div>
+
+                        {/* Visual Description */}
+                        <div className="p-3 bg-slate-50 rounded-xl text-xs space-y-1">
+                          <span className="font-bold text-slate-600 text-[10px] uppercase block">
+                            Bố Cục Cảnh 2D:
+                          </span>
+                          <p className="text-slate-700 leading-relaxed">
+                            {scene.visual_description}
+                          </p>
+                        </div>
+
+                        {/* AI Image Prompt */}
+                        <div className="p-3 bg-amber-50/60 border border-amber-200/70 rounded-xl text-xs space-y-1 relative group">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-amber-900 text-[10px] uppercase block">
+                              AI Image Prompt (Midjourney / DALL-E / Gemini):
+                            </span>
+                            <button
+                              onClick={() => copyPrompt(scene.ai_image_prompt, scene.scene_number)}
+                              className="text-amber-800 hover:text-amber-950 p-1 transition"
+                              title="Sao chép prompt"
+                            >
+                              {copiedIdx === scene.scene_number ? (
+                                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                              ) : (
+                                <Copy className="w-3.5 h-3.5" />
+                              )}
+                            </button>
+                          </div>
+                          <p className="text-slate-800 font-mono text-[11px] leading-relaxed select-all">
+                            {scene.ai_image_prompt}
+                          </p>
+                        </div>
+                      </>
                     )}
                   </div>
-                </div>
 
-                {/* AI Prompt Card */}
-                <div className="bg-slate-900 text-slate-200 p-4 rounded-lg space-y-2">
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-amber-400 font-mono font-medium flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5" />
-                      Prompt Tạo Ảnh AI (DALL-E 3 / Midjourney / Imagen):
-                    </span>
-                    <button
-                      onClick={() => copyPrompt(s.ai_image_prompt, idx)}
-                      className="inline-flex items-center gap-1 text-[11px] px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded transition"
-                    >
-                      {copiedIdx === idx ? (
-                        <>
-                          <Check className="w-3 h-3 text-emerald-400" /> Đã sao chép!
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3 h-3" /> Sao chép Prompt
-                        </>
-                      )}
-                    </button>
-                  </div>
-                  <p className="text-xs font-mono leading-relaxed text-slate-300 bg-slate-950/60 p-3 rounded border border-slate-800">
-                    {s.ai_image_prompt}
-                  </p>
-                </div>
-
-                {/* Citations references */}
-                {s.evidence_references && s.evidence_references.length > 0 && (
-                  <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
-                    <span className="font-semibold text-slate-500">Căn cứ sử liệu cảnh quay:</span>
-                    {s.evidence_references.map((c, cIdx) => (
-                      <span
-                        key={cIdx}
-                        className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-slate-100 border border-slate-200 rounded font-mono text-[11px] text-slate-700"
-                      >
-                        <BookOpen className="w-3 h-3 text-amber-600" />
-                        {c.filename} (Trang {c.page})
+                  {/* Citations */}
+                  {scene.evidence_references && scene.evidence_references.length > 0 && (
+                    <div className="pt-2 border-t border-slate-100 flex items-center gap-1.5 text-[11px] text-emerald-800">
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <span className="truncate">
+                        Bảo chứng: {scene.evidence_references[0].filename} (Trang {scene.evidence_references[0].page})
                       </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

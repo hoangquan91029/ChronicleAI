@@ -51,6 +51,8 @@ def ensure_sample_data_loaded():
 
         # 2. Authentic Archival Corpus (DVSKTT)
         archive_file = settings.BASE_DIR / "data" / "sources" / "dai_viet_su_ky_toan_thu_ban_ky_thuc_luc_quyen_12_13.json"
+        if not archive_file.exists():
+            archive_file = settings.BASE_DIR.parent / "data" / "sources" / "dai_viet_su_ky_toan_thu_ban_ky_thuc_luc_quyen_12_13.json"
         if archive_file.exists():
             try:
                 with open(archive_file, "r", encoding="utf-8") as f:
