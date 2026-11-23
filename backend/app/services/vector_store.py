@@ -1,5 +1,5 @@
 import re
-from typing import List, Dict, Optional, Tuple
+from typing import List, Dict, Optional, Tuple, Any
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -120,6 +120,40 @@ class CitationVectorStore:
 
     def get_document_ids(self) -> List[str]:
         return list(set(c.document_id for c in self.chunk_list))
+
+    def delete_document(self, document_id: str):
+        """Remove all chunks associated with a document and refit index if necessary."""
+        keys_to_del = [k for k, c in self.chunks.items() if c.document_id == document_id]
+        for k in keys_to_del:
+            del self.chunks[k]
+        self.chunk_list = list(self.chunks.values())
+        if self.chunk_list:
+            texts = [c.text for c in self.chunk_list]
+            self.embedding_service.fit(texts)
+            self.embeddings = self.embedding_service.transform(texts)
+        else:
+            self.embeddings = None
+
+    def sync_from_store(self, document_store):
+        """Sync chunks from persistent SQLite store into active retrieval index."""
+        chunks = document_store.get_all_chunks()
+        if chunks:
+            self.add_chunks(chunks)
+
+    def get_stats(self) -> Dict[str, Any]:
+        """Return operational statistics about the vector store."""
+        doc_ids = self.get_document_ids()
+        vocab_size = 0
+        if hasattr(self.embedding_service, "vectorizer") and getattr(self.embedding_service.vectorizer, "vocabulary_", None):
+            vocab_size = len(self.embedding_service.vectorizer.vocabulary_)
+        return {
+            "total_chunks": len(self.chunk_list),
+            "total_documents": len(doc_ids),
+            "document_ids": doc_ids,
+            "vocabulary_size": vocab_size,
+            "storage_engine": "sqlite3_backed_multilingual_vector_store",
+            "is_indexed": self.embeddings is not None and len(self.chunk_list) > 0
+        }
 
     def clear(self):
         self.chunks.clear()

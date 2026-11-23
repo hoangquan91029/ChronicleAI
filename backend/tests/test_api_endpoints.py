@@ -121,3 +121,66 @@ async def test_api_script_and_storyboard_pipeline():
         export_sb_resp = await client.post("/api/storyboards/export/markdown", json=storyboard)
         assert export_sb_resp.status_code == 200
         assert "AI Image-Generation Prompt" in export_sb_resp.text
+
+
+@pytest.mark.asyncio
+async def test_api_document_validation_and_url_registration():
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        # Invalid PDF magic bytes
+        fake_files = {"file": ("fake.pdf", b"NOT_A_REAL_PDF_DATA", "application/pdf")}
+        resp = await client.post("/api/documents/upload", files=fake_files)
+        assert resp.status_code == 400
+        assert "Missing %PDF-" in resp.json()["detail"] or "Invalid PDF" in resp.json()["detail"]
+
+        # Register URL source
+        url_payload = {
+            "url": "https://digitizingvietnam.com/items/show/dvsktt-vol12",
+            "title": "Đại Việt Sử Ký Toàn Thư Quyển XII Bản Kỷ Thực Lục",
+            "text": "Năm Quang Thuận thứ 8 (1467), vua Lê Thánh Tông sai các nha môn hiệu khám lại sách vở và hoàn thiện điển chế quốc gia.",
+            "source_id": "dvsktt_1697",
+            "folio_ref": "XII_1a_1b"
+        }
+        url_resp = await client.post("/api/documents/register-url", json=url_payload)
+        assert url_resp.status_code == 200
+        url_data = url_resp.json()
+        doc_id = url_data["document_id"]
+        assert "doc_url_" in doc_id
+        assert url_data["total_chunks"] >= 1
+
+        # Retrieve registered document
+        get_doc_resp = await client.get(f"/api/documents/{doc_id}")
+        assert get_doc_resp.status_code == 200
+        assert get_doc_resp.json()["filename"] == url_payload["title"]
+
+        # Delete document
+        del_resp = await client.delete(f"/api/documents/{doc_id}")
+        assert del_resp.status_code == 200
+        assert del_resp.json()["status"] == "success"
+
+        # Verify 404 after deletion
+        get_after_del = await client.get(f"/api/documents/{doc_id}")
+        assert get_after_del.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_api_rag_query_and_stats():
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        # RAG Query endpoint
+        query_payload = {"query": "Bộ luật Hồng Đức bảo vệ quyền lợi phụ nữ như thế nào?", "top_k": 3}
+        query_resp = await client.post("/api/rag/query", json=query_payload)
+        assert query_resp.status_code == 200
+        q_data = query_resp.json()
+        assert q_data["grounded"] is True
+        assert len(q_data["citations"]) > 0
+        assert len(q_data["retrieved_chunks"]) > 0
+
+        # RAG Stats endpoint
+        stats_resp = await client.get("/api/rag/stats")
+        assert stats_resp.status_code == 200
+        s_data = stats_resp.json()
+        assert s_data["total_chunks"] > 0
+        assert s_data["total_documents"] > 0
+        assert "storage_engine" in s_data
+
