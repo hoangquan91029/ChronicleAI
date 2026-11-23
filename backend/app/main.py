@@ -9,7 +9,8 @@ from app.routers import (
     rag_router,
     verify_router,
     scripts_router,
-    storyboards_router
+    storyboards_router,
+    videos_router
 )
 from app.services.pdf_processor import PDFProcessor
 from app.services.vector_store import global_vector_store
@@ -126,6 +127,8 @@ app.include_router(rag_router)
 app.include_router(verify_router)
 app.include_router(scripts_router)
 app.include_router(storyboards_router)
+app.include_router(videos_router)
+
 
 
 @app.get("/")
