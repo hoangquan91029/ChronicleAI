@@ -1,0 +1,69 @@
+{
+  "case_study": "Emperor Le Thanh Tong (1460-1497)",
+  "historical_period": "Dai Viet, Early Le Dynasty (Nha Hau Le, Thoi Le So)",
+  "canonical_sources": [
+    {
+      "source_id": "DVSKTT-BKTL-Q12",
+      "work_title": "Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục — Quyển XII",
+      "edition": "Nội các quan bản (1697)",
+      "coverage": "1460-1472 (Quang Thuận 1 đến Hồng Đức 3)",
+      "iiif_manifest_base": "https://iiif.digitizingvietnam.com/iiif/2/ban-ky-thuc-luc/quyen12/",
+      "folios": {
+        "accession_and_naming": {
+          "folio_id": "DVSKTT_ban_thuc_XII_1a",
+          "date": "Canh Thìn, Quang Thuận năm thứ 1 [1460]",
+          "summary": "Hoàng tử Tư Thành lên ngôi tại điện Tường Quang, lấy niên hiệu Quang Thuận sau đổi thành Hồng Đức."
+        },
+        "six_ministries_reform": {
+          "folio_id": "DVSKTT_ban_thuc_XII_14b",
+          "date": "Bính Tuất, Quang Thuận năm thứ 7 [1466]",
+          "summary": "Bãi bỏ chức Tể tướng, Tam công, Tam thiếu; định quy chế Lục Bộ và Lục Khoa."
+        },
+        "thirteen_circuits_creation": {
+          "folio_id": "DVSKTT_ban_thuc_XII_18a",
+          "date": "Bính Tuất, Quang Thuận năm thứ 7 [1466] & Tân Mão, Hồng Đức năm thứ 2 [1471]",
+          "summary": "Chia cả nước thành 12 Đạo thừa tuyên, sau chiến dịch Nam chinh lập thêm Đạo Quảng Nam là đạo thứ 13."
+        },
+        "southern_campaign_champa": {
+          "folio_id": "DVSKTT_ban_thuc_XII_51b",
+          "date": "Tân Mão, Hồng Đức năm thứ 2 [1471]",
+          "summary": "Thống lĩnh 20 vạn đại quân tiến đánh Chiêm Thành, bắt sống vua Trà Toàn, bình định biên cương phía Nam."
+        },
+        "territorial_defense_decree": {
+          "folio_id": "DVSKTT_ban_thuc_XII_62a",
+          "date": "Quý Tỵ, Hồng Đức năm thứ 4 [1473]",
+          "summary": "Lời răn dạy thái bảo Lê Cảnh Huy: 'Một thước núi, một tấc sông của ta, lẽ nào lại tự tiện vứt bỏ... Tội phải tru di!'"
+        }
+      }
+    },
+    {
+      "source_id": "DVSKTT-BKTL-Q13",
+      "work_title": "Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục — Quyển XIII",
+      "edition": "Nội các quan bản (1697)",
+      "coverage": "1473-1497 (Hồng Đức 4 đến Hồng Đức 28)",
+      "iiif_manifest_base": "https://iiif.digitizingvietnam.com/iiif/2/ban-ky-thuc-luc/quyen13/",
+      "folios": {
+        "doctor_stelae_erection": {
+          "folio_id": "DVSKTT_ban_thuc_XIII_23b",
+          "date": "Giáp Thìn, Hồng Đức năm thứ 15 [1484]",
+          "summary": "Ra lệnh dựng bia đề danh Tiến sĩ tại Văn Miếu - Quốc Tử Giám. Bài văn bia Thân Nhân Trung: 'Hiền tài là nguyên khí của quốc gia...'"
+        },
+        "hong_duc_map": {
+          "folio_id": "DVSKTT_ban_thuc_XIII_48a",
+          "date": "Canh Tuất, Hồng Đức năm thứ 21 [1490]",
+          "summary": "Hoàn thành bộ tập bản đồ địa lý Hồng Đức ghi nhận đầy đủ 13 thừa tuyên, sông núi, bờ cõi Đại Việt."
+        },
+        "tao_dan_society": {
+          "folio_id": "DVSKTT_ban_thuc_XIII_64b",
+          "date": "Ất Mão, Hồng Đức năm thứ 26 [1495]",
+          "summary": "Sáng lập Hội Tao Đàn Nhị Thập Bát Tú, Hoàng đế xưng Tao Đàn Đô nguyên súy; trước tác Hồng Đức quốc âm thi tập."
+        },
+        "emperor_demise": {
+          "folio_id": "DVSKTT_ban_thuc_XIII_88b",
+          "date": "Đinh Tỵ, Hồng Đức năm thứ 28 [1497]",
+          "summary": "Ngày 30 tháng Giêng, Hoàng đế băng tại điện Bảo Quang, hưởng thọ 56 tuổi, trị vì 38 năm."
+        }
+      }
+    }
+  ]
+}

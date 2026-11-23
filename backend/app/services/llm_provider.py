@@ -187,7 +187,7 @@ class ChronicleOfflineRuleEngine(BaseLLMProvider):
             (r"\bkhông cần tranh biện\b", "kiên quyết tranh biện"),
             (r"\bcấm vẽ bản đồ\b", "bản đồ"),
             (r"\bthiêu hủy\b", "hoàn thành"),
-            (r"\btrà toàn sáng lập\b", "ông thành lập"),
+            (r"\btrà toàn sáng lập\b", "sáng lập"),
         ]
         if not contradiction_detected:
             for neg_pattern, pos_s in negation_pairs:
