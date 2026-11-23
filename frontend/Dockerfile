@@ -2,6 +2,9 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+ARG BACKEND_URL=http://backend:8000
+ENV BACKEND_URL=$BACKEND_URL
+
 COPY package*.json ./
 RUN npm ci
 
@@ -13,11 +16,13 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV BACKEND_URL=http://backend:8000
 
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
+COPY --from=builder /app/next.config.mjs ./
 
 EXPOSE 3000
 

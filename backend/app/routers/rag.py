@@ -22,6 +22,9 @@ async def search_evidence(req: SearchQuery):
         query=req.query,
         top_k=req.top_k,
         document_id=req.document_id,
+        source_id=req.source_id,
+        min_page=req.min_page,
+        max_page=req.max_page,
         min_score=0.04
     )
     return SearchResponse(

@@ -10,6 +10,10 @@ class ChunkMetadata(BaseModel):
     document_id: str = Field(..., description="Parent document identifier")
     chunk_index: int = Field(..., description="Sequence index of chunk within the document")
     word_count: int = Field(default=0, description="Word count of the chunk text")
+    source_id: Optional[str] = Field(None, description="Source collection identifier")
+    source_title: Optional[str] = Field(None, description="Source collection title")
+    original_url: Optional[str] = Field(None, description="Archive or IIIF URL")
+    folio_ref: Optional[str] = Field(None, description="Traditional volume and folio reference")
 
 
 class DocumentMetadata(BaseModel):

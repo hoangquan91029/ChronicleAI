@@ -21,30 +21,36 @@ class CitationVectorStore:
         self.embeddings: Optional[np.ndarray] = None
 
     def add_chunks(self, chunks: List[ChunkMetadata]):
-        """Add new chunks to the vector store and re-index embeddings."""
+        """Add new chunks to the vector store and re-index embeddings. Avoids duplicate indexing."""
         if not chunks:
             return
 
+        new_count = 0
         for chunk in chunks:
-            self.chunks[chunk.chunk_id] = chunk
+            if chunk.chunk_id not in self.chunks or self.chunks[chunk.chunk_id].text != chunk.text:
+                self.chunks[chunk.chunk_id] = chunk
+                new_count += 1
 
-        # Deduplicate and sort chunk_list
-        self.chunk_list = list(self.chunks.values())
-        texts = [c.text for c in self.chunk_list]
-
-        # Fit embedding service on all chunk texts and generate vectors
-        self.embedding_service.fit(texts)
-        self.embeddings = self.embedding_service.transform(texts)
+        # Recompute index if new chunks were added or index uninitialized
+        if new_count > 0 or self.embeddings is None:
+            self.chunk_list = list(self.chunks.values())
+            texts = [c.text for c in self.chunk_list]
+            self.embedding_service.fit(texts)
+            self.embeddings = self.embedding_service.transform(texts)
 
     def search(
         self,
         query: str,
         top_k: int = 5,
         document_id: Optional[str] = None,
+        source_id: Optional[str] = None,
+        min_page: Optional[int] = None,
+        max_page: Optional[int] = None,
         min_score: float = 0.05
     ) -> List[SearchResult]:
         """
-        Search indexed chunks by query similarity.
+        Search indexed chunks by query similarity with fine-grained metadata filtering.
+        Avoids mixing evidence from unrelated documents or sources.
         Returns ranked SearchResult objects with citations.
         """
         if not self.chunk_list or self.embeddings is None:
@@ -56,11 +62,17 @@ class CitationVectorStore:
         # Calculate cosine similarity against all chunks
         scores = cosine_similarity(query_vec, self.embeddings)[0]
 
-        # Combine with candidate indices
+        # Combine with candidate indices and apply metadata filters
         results: List[Tuple[float, ChunkMetadata]] = []
         for idx, score in enumerate(scores):
             chunk = self.chunk_list[idx]
             if document_id and chunk.document_id != document_id:
+                continue
+            if source_id and getattr(chunk, "source_id", None) != source_id:
+                continue
+            if min_page is not None and chunk.page < min_page:
+                continue
+            if max_page is not None and chunk.page > max_page:
                 continue
             if score >= min_score:
                 results.append((float(score), chunk))
@@ -77,7 +89,12 @@ class CitationVectorStore:
                 page=chunk.page,
                 chunk_id=chunk.chunk_id,
                 quote=quote,
-                score=round(score, 4)
+                score=round(score, 4),
+                source_id=getattr(chunk, "source_id", None),
+                source_title=getattr(chunk, "source_title", None),
+                original_url=getattr(chunk, "original_url", None),
+                document_id=chunk.document_id,
+                folio_ref=getattr(chunk, "folio_ref", None)
             )
             search_results.append(
                 SearchResult(

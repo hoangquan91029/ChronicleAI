@@ -1,17 +1,22 @@
 # ChronicleAI Automated Test Results & Quality Report
 
-- **Date of Execution**: November 22, 2026
+- **Date of Execution**: November 23, 2026
 - **Test Framework**: Pytest 9.2.0, Python 3.11.15, Linux x86_64
 - **Coverage Plugin**: pytest-cov 7.1.0, coverage 7.17.4
-- **Status**: **29 PASSED, 0 FAILED** (100% test pass rate)
+- **Status**: **36 PASSED, 0 FAILED** (100% test pass rate)
+- **Overall Statement Coverage**: **90%** (848/946 statements)
+- **Historical Benchmark**: **100.0% Accuracy** (24/24 claims on Emperor Lê Thánh Tông)
 
 ---
 
-## 1. Reproduction Command
+## 1. Reproduction Commands
 
 ```bash
-# From repository root
+# Run full automated test suite with coverage
 pytest --cov=backend/app --cov-report=term-missing backend/tests
+
+# Run historical benchmark evaluation
+python scripts/evaluate_benchmark.py
 ```
 
 ---
@@ -26,22 +31,24 @@ configfile: pytest.ini
 plugins: anyio-4.16.0, cov-7.1.0, asyncio-1.5.0
 asyncio: mode=Mode.STRICT, debug=False
 
-backend/tests/test_api_endpoints.py .....                                [ 17%]
-backend/tests/test_claim_verifier.py ....                                [ 31%]
-backend/tests/test_e2e_integration.py .                                  [ 34%]
-backend/tests/test_pdf_processor.py ...........                          [ 72%]
-backend/tests/test_scriptwriter.py ..                                    [ 79%]
-backend/tests/test_storyboard.py ..                                      [ 86%]
+backend/tests/test_api_endpoints.py .....                                [ 13%]
+backend/tests/test_claim_verifier.py ....                                [ 25%]
+backend/tests/test_e2e_integration.py .                                  [ 27%]
+backend/tests/test_historical_benchmark.py ..                            [ 33%]
+backend/tests/test_llm_providers.py .....                                [ 47%]
+backend/tests/test_pdf_processor.py ...........                          [ 77%]
+backend/tests/test_scriptwriter.py ..                                    [ 83%]
+backend/tests/test_storyboard.py ..                                      [ 88%]
 backend/tests/test_vector_and_retrieval.py ....                          [100%]
 
 ================================ tests coverage ================================
 Name                                           Stmts   Miss  Cover
 ------------------------------------------------------------------
 backend/app/config.py                             49     13    73%
-backend/app/main.py                               42      4    90%
+backend/app/main.py                               46      4    91%
 backend/app/models/__init__.py                     6      0   100%
-backend/app/models/document.py                    29      0   100%
-backend/app/models/rag.py                         37      1    97%
+backend/app/models/document.py                    33      0   100%
+backend/app/models/rag.py                         45      1    98%
 backend/app/models/script.py                      50      0   100%
 backend/app/models/storyboard.py                  26      0   100%
 backend/app/models/verification.py                28      0   100%
@@ -53,14 +60,14 @@ backend/app/routers/storyboards.py                38      6    84%
 backend/app/routers/verify.py                      8      0   100%
 backend/app/services/claim_verifier.py            32      3    91%
 backend/app/services/embedding_service.py         25      3    88%
-backend/app/services/llm_provider.py             144     40    72%
-backend/app/services/pdf_processor.py            140     15    89%
+backend/app/services/llm_provider.py             205     25    88%
+backend/app/services/pdf_processor.py            140     13    91%
 backend/app/services/scriptwriter.py              29      3    90%
 backend/app/services/storyboard_generator.py       9      0   100%
-backend/app/services/vector_store.py              72     11    85%
+backend/app/services/vector_store.py              82     14    83%
 ------------------------------------------------------------------
-TOTAL                                            859    112    87%
-============================== 29 passed in 2.48s ==============================
+TOTAL                                            946     98    90%
+============================== 36 passed in 2.27s ==============================
 ```
 
 ---
@@ -78,30 +85,41 @@ TOTAL                                            859    112    87%
 8. `test_oversized_sentence_subdivision`: Verifies single sentences longer than `chunk_size` are cleanly split at word boundaries.
 9. `test_chunk_overlap_preservation`: Validates consecutive chunks share overlapping context across boundaries.
 10. `test_no_missing_text`: Exhaustively compares reconstructed words from chunks against raw page text (0 lost tokens).
-11. `test_unicode_normalization_nfc`: Verifies Vietnamese composite and precomposed diacritics normalize consistently to Unicode NFC.
+11. `test_unicode_preservation`: Validates all Vietnamese diacritics and tone marks (`ă`, `â`, `đ`, `ê`, `ô`, `ơ`, `ư`) are preserved with NFC normalization.
 
-### B. Retrieval & Grounding (`test_vector_and_retrieval.py` — 4 Tests)
-1. `test_vector_store_indexing`: Document registration and chunk indexing.
-2. `test_retrieval_doctor_stelae`: Precise top-k semantic retrieval for Van Mieu 1484 stelae.
-3. `test_retrieval_territory_defense`: High-confidence retrieval of 1473 territorial defense decree.
-4. `test_empty_query_or_unrelated_query`: Rejection of out-of-domain modern queries (e.g., GPS satellites) with score < 0.4.
+### B. Vector Indexing & Retrieval (`test_vector_and_retrieval.py` — 4 Tests)
+1. `test_indexing_and_vectorization`: Correct shape generation and vocabulary creation.
+2. `test_retrieval_ranking_specific_achievement`: Ranks 1484 Doctor Stelae chunk as #1 result for education query.
+3. `test_retrieval_territorial_defense`: Ranks 1473 territorial decree chunk as #1 for sovereignty query.
+4. `test_retrieval_low_similarity_rejection`: Unrelated queries score below threshold, rejecting irrelevant citations.
 
-### C. Claim Verification (`test_claim_verifier.py` — 4 Tests)
-1. `test_verify_supported_claim`: Correctly labels verified historical claim as `SUPPORTED` with exact page/chunk citations.
-2. `test_verify_contradicted_claim`: Correctly labels inverted dates/events as `CONTRADICTED` with counter-evidence.
-3. `test_verify_insufficient_evidence_claim`: Flags uncorroborated assertions as `INSUFFICIENT_EVIDENCE`.
-4. `test_unsupported_claim_never_invents_citations`: Verifies zero citation fabrication for ungrounded claims.
+### C. Historical Benchmark Evaluation (`test_historical_benchmark.py` — 2 Tests)
+1. `test_historical_benchmark_dataset_integrity`: Validates structure, fields, and balance across the 24 claims (8/8/8).
+2. `test_historical_benchmark_execution`: Runs the 24-claim benchmark and asserts >= 85% accuracy (measured: 100.0%).
 
-### D. Educational Script & Storyboard (`test_scriptwriter.py`, `test_storyboard.py` — 4 Tests)
-1. `test_generate_script_structure`: Enforces 7 canonical scenes (Hook, Background, Narrative, Achievements, Conflict, Conclusion).
-2. `test_fictional_dialogues_clearly_labeled`: Validates `is_fictional=True` and `DialogueType.FICTIONAL_DRAMATIZATION` on dramatized scenes.
-3. `test_generate_storyboard_scenes`: Validates 2D vector stick-figure visual descriptions, camera directions, and AI image prompts.
-4. `test_storyboard_evidence_references`: Validates traceability linking storyboard scenes to source citations.
+### D. Multi-Provider LLM & Dynamic Generation (`test_llm_providers.py` — 5 Tests)
+1. `test_offline_engine_grounded_qa`: Grounded question-answering with exact citation attribution.
+2. `test_dynamic_script_generation_for_arbitrary_subject`: Proves arbitrary historical figures (e.g. Trần Hưng Đạo) dynamically synthesize scenes directly from ingested chunks rather than falling back to hardcoded text.
+3. `test_gemini_provider_mock`: Remote Gemini 1.5 Flash provider API integration via httpx.
+4. `test_openai_provider_mock`: Remote OpenAI GPT-4o provider API integration via httpx.
+5. `test_provider_factory_fallback`: Provider factory selection, environment variable configuration, and automatic fallback.
 
-### E. API Endpoints & E2E Integration (`test_api_endpoints.py`, `test_e2e_integration.py` — 6 Tests)
-1. `test_health_check`: Fast ping at `/api/health`.
-2. `test_list_documents`: Document catalog inspection.
-3. `test_search_rag`: Search API response schema.
-4. `test_verify_claims_endpoint`: Multi-claim verification endpoint.
-5. `test_generate_script_endpoint`: Video script generator endpoint.
-6. `test_e2e_pipeline_journey`: Complete end-to-end journey from PDF bytes -> chunk extraction -> vector indexing -> retrieval -> verification -> script generation -> storyboard generation.
+### E. Claim Verification (`test_claim_verifier.py` — 4 Tests)
+1. `test_verify_supported_claim`: Verified claim is classified `SUPPORTED` with page and quote citation.
+2. `test_verify_contradicted_claim`: Temporal mismatch (e.g. 1520 vs 1460) classified `CONTRADICTED`.
+3. `test_verify_insufficient_evidence_claim`: Anachronisms classified `INSUFFICIENT_EVIDENCE` with zero citations.
+4. `test_batch_claim_verification`: Batch processing across mixed labels.
+
+### F. Scriptwriting & Storyboard Agents (`test_scriptwriter.py`, `test_storyboard.py` — 4 Tests)
+1. `test_scriptwriter_generation`: 7-scene narrative, chronological progression, citations, and review flag auditing.
+2. `test_scriptwriter_fictional_dialogue_labeling`: Explicit `[HƯ CẤU / KỊCH BẢN]` separation from authentic quotes.
+3. `test_storyboard_generation`: Visual settings, camera staging, and 2D minimalist vector directions.
+4. `test_storyboard_prompts_contain_historical_costumes`: Image prompts contain authentic 15th-century attire (`áo giao lĩnh`, `khăn đóng`).
+
+### G. API Endpoints & E2E Integration (`test_api_endpoints.py`, `test_e2e_integration.py` — 6 Tests)
+1. `test_api_health`: Health status, indexed chunk counts, active provider class, and available providers.
+2. `test_api_document_listing`: List uploaded documents with metadata.
+3. `test_api_search_and_qa`: RAG search and grounded Q&A with citations.
+4. `test_api_claim_verification`: API batch verification endpoint.
+5. `test_api_script_and_storyboard_pipeline`: Full script and storyboard generation and markdown export.
+6. `test_end_to_end_journey`: Ingestion -> Chunking -> Vector Indexing -> Retrieval -> Verification -> Scriptwriting -> Storyboard.

@@ -4,7 +4,8 @@
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg)](https://fastapi.tiangolo.com/)
 [![Next.js](https://img.shields.io/badge/Next.js-14.2+-black.svg)](https://nextjs.org/)
-[![Pytest](https://img.shields.io/badge/Pytest-29%20Passed%20(87%25%20Coverage)-brightgreen.svg)](https://pytest.org/)
+[![Pytest](https://img.shields.io/badge/Pytest-36%20Passed%20(90%25%20Coverage)-brightgreen.svg)](https://pytest.org/)
+[![Benchmark](https://img.shields.io/badge/Historical%20Benchmark-100%25%20Accuracy-blue.svg)](benchmarks/le_thanh_tong/REPORT.md)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED.svg)](https://www.docker.com/)
 
 ---
@@ -47,14 +48,16 @@ PDF Ingestion (PyMuPDF)
   - Page-by-page preservation and document metadata extraction.
   - Detection of scanned image-only PDFs with explicit OCR notification (`status: "scanned_ocr_required"`), refusing to hallucinate content.
   - Page-bound chunking with unique IDs: `doc_id_p{page}_c{index}`.
-- ✅ **Milestone 2 — RAG & Fact Checking**:
+- ✅ **Milestone 2 — RAG, Archival Provenance & Fact-Checking Benchmark**:
+  - Grounded in canonical woodblock edition: *Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục* (1697) with IIIF Image API integration (`data/sources/source_registry.json`).
   - Multilingual subword embedding capturing Vietnamese diacritics and compound names without requiring GPU cold-start downloads.
-  - Citation-aware vector store attaching `{filename, page, chunk_id, quote}`.
+  - Citation-aware vector store attaching `{filename, page, chunk_id, quote, folio_ref, source_id}`.
   - Tri-state verification engine: `SUPPORTED`, `CONTRADICTED`, and `INSUFFICIENT_EVIDENCE`.
-  - Detection of temporal conflicts (e.g. wrong year) and polarity contradictions (e.g. defeat vs. victory).
-- ✅ **Milestone 3 — Scriptwriting Agent**:
+  - **Empirical Benchmark**: 24 balanced propositions on Emperor Lê Thánh Tông achieving **100.0% accuracy** and **100% citation integrity** with zero hallucinations.
+- ✅ **Milestone 3 — Scriptwriting Agent & Multi-Provider LLM**:
+  - Multi-backend LLM integration: Google Gemini 1.5 Flash, OpenAI GPT-4o, and deterministic offline rule engine.
+  - Dynamic scene synthesis from ingested chunks for arbitrary historical figures, alongside a 7-scene narrative for the Lê Thánh Tông case study.
   - Educational documentary script for 15–20 minute video pacing (~900–1200s).
-  - Opening hook, historical background, chronological narrative, achievements, conflict, and conclusion.
   - Explicit labeling: `[CHÍNH SỬ]` (historical quotes) vs. `[HƯ CẤU / KỊCH BẢN]` (fictional dramatizations).
   - Automated flagging of unverified scenes (`needs_review: true`).
 - ✅ **Milestone 4 — Storyboard Generator**:

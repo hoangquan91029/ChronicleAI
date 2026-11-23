@@ -13,6 +13,7 @@ from app.routers import (
 )
 from app.services.pdf_processor import PDFProcessor
 from app.services.vector_store import global_vector_store
+from app.services.llm_provider import get_llm_provider
 from app.routers.documents import uploaded_docs
 
 
@@ -85,9 +86,15 @@ async def root():
 
 @app.get("/api/health")
 async def health_check():
+    provider = get_llm_provider()
+    provider_class = provider.__class__.__name__
+    model_name = getattr(provider, "model", "rule-heuristic-v1")
     return {
         "status": "healthy",
         "documents_indexed": len(uploaded_docs),
         "total_chunks_indexed": len(global_vector_store.chunk_list),
-        "llm_provider": settings.LLM_PROVIDER
+        "llm_provider": settings.LLM_PROVIDER,
+        "active_provider_class": provider_class,
+        "model": model_name,
+        "available_providers": ["offline", "gemini", "openai"]
     }

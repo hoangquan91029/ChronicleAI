@@ -43,6 +43,13 @@ jobs:
           python scripts/run_demo_extraction.py
           test -s demo_output/chunks.json
 
+      - name: Evaluate Historical Fact-Checking Benchmark
+        run: |
+          python scripts/evaluate_benchmark.py
+          test -s benchmarks/le_thanh_tong/results.json
+          test -s benchmarks/le_thanh_tong/REPORT.md
+          test -s benchmarks/le_thanh_tong/confusion_matrix.png
+
   frontend-build:
     name: Frontend Next.js Build
     runs-on: ubuntu-latest
@@ -63,3 +70,13 @@ jobs:
       - name: Build Next.js Application
         working-directory: ./frontend
         run: npm run build
+
+  docker-validation:
+    name: Docker Compose Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Docker Compose Configuration
+        run: |
+          docker compose config
+
