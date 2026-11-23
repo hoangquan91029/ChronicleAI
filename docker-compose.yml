@@ -12,6 +12,7 @@ services:
       - CORS_ORIGINS=*
     volumes:
       - backend_data:/app/data
+      - backend_exports:/app/data/exports
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
       interval: 10s
@@ -36,3 +37,4 @@ services:
 
 volumes:
   backend_data:
+  backend_exports:
