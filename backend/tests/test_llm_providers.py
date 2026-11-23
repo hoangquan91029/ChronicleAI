@@ -134,3 +134,65 @@ def test_provider_factory_fallback():
     with patch("app.config.settings.LLM_PROVIDER", "openai"), patch("app.config.settings.OPENAI_API_KEY", "valid-key"):
         provider = get_llm_provider()
         assert isinstance(provider, OpenAILLMProvider)
+
+
+@pytest.mark.asyncio
+async def test_gemini_verify_claim_mock():
+    provider = GeminiLLMProvider(api_key="test-key-gemini", model="gemini-1.5-flash")
+    chunk = create_sample_chunk("c1", 1, "Năm 1460, Hoàng đế Lê Thánh Tông lên ngôi ở tuổi 18.")
+
+    mock_resp = MagicMock()
+    mock_resp.status_code = 200
+    mock_resp.json.return_value = {
+        "candidates": [
+            {
+                "content": {
+                    "parts": [{"text": '{"status": "SUPPORTED", "confidence": 0.96, "explanation": "Tư liệu chứng thực Lê Thánh Tông lên ngôi năm 1460.", "has_conflict": false}'}]
+                }
+            }
+        ]
+    }
+
+    with patch("httpx.AsyncClient.post", new_callable=AsyncMock) as mock_post:
+        mock_post.return_value = mock_resp
+        verif = await provider.verify_claim("Lê Thánh Tông lên ngôi năm 1460", [chunk])
+        assert verif.status.value == "SUPPORTED"
+        assert verif.confidence >= 0.9
+        assert verif.provider_diagnostics["is_fallback"] is False
+        assert "gemini" in verif.provider_diagnostics["provider"]
+
+
+@pytest.mark.asyncio
+async def test_gemini_fallback_on_network_error():
+    provider = GeminiLLMProvider(api_key="test-key-gemini", model="gemini-1.5-flash")
+    chunk = create_sample_chunk("c1", 1, "Năm 1460, Hoàng đế Lê Thánh Tông lên ngôi.")
+
+    with patch("httpx.AsyncClient.post", new_callable=AsyncMock, side_effect=httpx.ConnectTimeout("Network timeout")):
+        verif = await provider.verify_claim("Lê Thánh Tông lên ngôi năm 1460", [chunk])
+        assert verif.status.value == "SUPPORTED"
+        assert verif.provider_diagnostics["is_fallback"] is True
+        assert verif.provider_diagnostics["provider"] == "offline_fallback"
+
+
+@pytest.mark.asyncio
+async def test_openai_verify_claim_mock():
+    provider = OpenAILLMProvider(api_key="test-key-openai", model="gpt-4o")
+    chunk = create_sample_chunk("c1", 1, "Năm 1460, Hoàng đế Lê Thánh Tông lên ngôi ở tuổi 18.")
+
+    mock_resp = MagicMock()
+    mock_resp.status_code = 200
+    mock_resp.json.return_value = {
+        "choices": [
+            {
+                "message": {"content": '{"status": "SUPPORTED", "confidence": 0.95, "explanation": "Đúng theo sử liệu 1460.", "has_conflict": false}'}
+            }
+        ]
+    }
+
+    with patch("httpx.AsyncClient.post", new_callable=AsyncMock) as mock_post:
+        mock_post.return_value = mock_resp
+        verif = await provider.verify_claim("Lê Thánh Tông lên ngôi năm 1460", [chunk])
+        assert verif.status.value == "SUPPORTED"
+        assert verif.provider_diagnostics["is_fallback"] is False
+        assert "openai" in verif.provider_diagnostics["provider"]
+

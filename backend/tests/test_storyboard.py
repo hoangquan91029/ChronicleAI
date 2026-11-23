@@ -64,3 +64,16 @@ async def test_storyboard_evidence_preservation(services):
     assert len(scene_6.evidence_references) > 0
     assert scene_6.evidence_references[0].page == 5
     assert scene_6.evidence_references[0].filename == "le_thanh_tong_dai_viet.pdf"
+
+
+@pytest.mark.asyncio
+async def test_storyboard_vertical_aspect_ratio(services):
+    sw, sb = services
+    script = await sw.generate_script(ScriptGenerationRequest(subject="Lê Thánh Tông"))
+    storyboard = await sb.generate_storyboard(script, aspect_ratio="9:16")
+
+    assert storyboard.aspect_ratio == "9:16"
+    assert "9:16" in storyboard.visual_theme
+    for scene in storyboard.scenes:
+        assert "9:16" in scene.ai_image_prompt or "vertical" in scene.ai_image_prompt.lower()
+

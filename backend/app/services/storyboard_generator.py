@@ -8,10 +8,12 @@ class StoryboardGeneratorService:
     def __init__(self):
         self.llm = get_llm_provider()
 
-    async def generate_storyboard(self, script: VideoScript) -> Storyboard:
+    async def generate_storyboard(self, script: VideoScript, aspect_ratio: str = "16:9") -> Storyboard:
         """
         Convert a VideoScript into an actionable animation storyboard.
         Produces minimalist 2D Vietnamese historical stick-figure character animation
         scenes with character dialogues, camera movements, and AI image prompts.
+        Supports aspect_ratio: '16:9' or '9:16'.
         """
-        return await self.llm.generate_storyboard(script)
+        return await self.llm.generate_storyboard(script, aspect_ratio=aspect_ratio)
+

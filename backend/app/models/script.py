@@ -1,6 +1,6 @@
 from enum import Enum
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from app.models.rag import Citation
 
 
@@ -27,11 +27,17 @@ class SceneType(str, Enum):
     CONCLUSION = "CONCLUSION"
 
 
+class ScriptFormat(str, Enum):
+    SHORTS = "SHORTS"              # 30-60s, fast-paced, high hook, punchy visual cues
+    EXPLAINER = "EXPLAINER"        # 3-5m, clear pedagogical overview
+    DOCUMENTARY = "DOCUMENTARY"    # 10-20m, deep archival breakdown
+
+
 class ScriptScene(BaseModel):
     scene_number: int = Field(..., description="Sequential scene index (1, 2, ...)")
     title: str = Field(..., description="Scene title / chapter header")
     scene_type: SceneType = Field(..., description="Scene dramatic purpose")
-    estimated_duration_seconds: int = Field(..., description="Duration in seconds (e.g. 90-150s)")
+    estimated_duration_seconds: int = Field(..., description="Duration in seconds (e.g. 15-180s)")
     historical_setting: str = Field(..., description="Time, location, historical environment")
     narration: str = Field(..., description="Main narrator voiceover text")
     dialogues: List[DialogueLine] = Field(default_factory=list, description="List of character dialogues")
@@ -44,7 +50,8 @@ class ScriptScene(BaseModel):
 class VideoScript(BaseModel):
     title: str
     subject: str = Field(default="Lê Thánh Tông", description="Historical figure or topic")
-    target_duration_minutes: float = Field(default=16.0, description="Target total duration in minutes (15-20 min)")
+    format: ScriptFormat = Field(default=ScriptFormat.DOCUMENTARY, description="Target video format")
+    target_duration_minutes: float = Field(default=16.0, description="Target total duration in minutes")
     total_estimated_duration_seconds: int = Field(default=960, description="Sum of scene durations")
     hook: str = Field(..., description="Engaging opening hook to capture viewers")
     background_summary: str = Field(..., description="Historical context & geopolitical background")
@@ -54,9 +61,23 @@ class VideoScript(BaseModel):
     verified_claims_count: int = 0
     flagged_for_review_count: int = 0
     sources_consulted: List[str] = Field(default_factory=list)
+    provider_diagnostics: Optional[Dict[str, Any]] = None
 
 
 class ScriptGenerationRequest(BaseModel):
     subject: str = Field(default="Emperor Lê Thánh Tông (1460–1497)", description="Topic / Figure to script")
-    target_minutes: int = Field(default=16, ge=10, le=25, description="Target duration in minutes (15-20 min recommended)")
+    target_minutes: Optional[float] = Field(default=None, description="Target duration in minutes (e.g. 1.0 for Shorts, 4.0 for Explainer, 16.0 for Documentary)")
+    format: Optional[ScriptFormat] = Field(default=None, description="Target format (defaults to DOCUMENTARY if target_minutes >= 10, EXPLAINER if >= 2, SHORTS if < 2)")
     document_ids: Optional[List[str]] = Field(None, description="Scope to specific uploaded document IDs")
+
+
+class SceneUpdateRequest(BaseModel):
+    title: Optional[str] = None
+    scene_type: Optional[SceneType] = None
+    estimated_duration_seconds: Optional[int] = None
+    historical_setting: Optional[str] = None
+    narration: Optional[str] = None
+    dialogues: Optional[List[DialogueLine]] = None
+    key_historical_facts: Optional[List[str]] = None
+    needs_review: Optional[bool] = None
+    review_notes: Optional[str] = None

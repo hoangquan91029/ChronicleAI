@@ -41,11 +41,38 @@ class ScriptwriterService:
                 seen_ids.add(c.chunk_id)
                 deduped_chunks.append(c)
 
+        # Determine duration & format
+        fmt = request.format
+        target_mins = request.target_minutes
+        if fmt is None:
+            if target_mins is not None:
+                if target_mins <= 1.5:
+                    fmt = "SHORTS"
+                elif target_mins <= 5.0:
+                    fmt = "EXPLAINER"
+                else:
+                    fmt = "DOCUMENTARY"
+            else:
+                fmt = "DOCUMENTARY"
+                target_mins = 16.0
+        elif target_mins is None:
+            fmt_val = fmt.value if hasattr(fmt, "value") else str(fmt)
+            if fmt_val == "SHORTS":
+                target_mins = 1.0
+            elif fmt_val == "EXPLAINER":
+                target_mins = 4.0
+            else:
+                target_mins = 16.0
+
+        fmt_str = fmt.value if hasattr(fmt, "value") else str(fmt)
+
         script = await self.llm.generate_script(
             subject=request.subject,
-            target_minutes=request.target_minutes,
-            chunks=deduped_chunks
+            target_minutes=float(target_mins),
+            chunks=deduped_chunks,
+            format=fmt_str
         )
+
 
         # Audit script: any scenes without citations must be flagged for review
         flagged_count = 0
