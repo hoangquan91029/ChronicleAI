@@ -353,14 +353,59 @@ class VideoRendererService:
 
         return output_file
 
-    def generate_subtitles_srt(self, scenes: List[StoryboardScene], output_file: Path) -> Path:
-        """Generate a synchronized SRT subtitle file matching each scene's narration."""
+    def generate_scene_narration_tts(self, text: str, output_file: Path) -> Optional[float]:
+        """
+        Synthesize spoken Vietnamese narration using gTTS (Google Text-to-Speech).
+        Converts speech to 44.1kHz stereo WAV for seamless FFmpeg timeline integration.
+        Returns audio duration in seconds if successful, or None if TTS fails.
+        """
+        if not text or not text.strip():
+            return None
+
+        try:
+            from gtts import gTTS
+            with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as tmp_mp3:
+                mp3_path = Path(tmp_mp3.name)
+
+            tts = gTTS(text=text.strip(), lang="vi", slow=False)
+            tts.save(str(mp3_path))
+
+            # Convert mp3 to 44.1kHz stereo WAV via ffmpeg
+            cmd = [
+                "ffmpeg", "-y", "-i", str(mp3_path),
+                "-ar", "44100", "-ac", "2",
+                str(output_file)
+            ]
+            res = subprocess.run(cmd, capture_output=True, text=True)
+            if mp3_path.exists():
+                mp3_path.unlink()
+
+            if res.returncode == 0 and output_file.exists():
+                with wave.open(str(output_file), "r") as wf:
+                    frames = wf.getnframes()
+                    rate = wf.getframerate()
+                    duration = frames / float(rate)
+                logger.info(f"Successfully synthesized TTS narration ({duration:.2f}s): {text[:50]}...")
+                return duration
+            return None
+        except Exception as e:
+            logger.warning(f"TTS narration synthesis unavailable ({e}). Falling back to ambient background audio.")
+            return None
+
+    def generate_subtitles_srt(
+        self,
+        scenes: List[StoryboardScene],
+        output_file: Path,
+        durations: Optional[List[float]] = None
+    ) -> Path:
+        """Generate a synchronized SRT subtitle file precisely matching each scene's audio timeline."""
         srt_lines = []
         current_time = 0.0
 
         for i, scene in enumerate(scenes, start=1):
+            dur = durations[i - 1] if (durations and len(durations) >= i) else max(4.0, float(scene.estimated_duration_seconds))
             start_t = current_time
-            end_t = current_time + scene.estimated_duration_seconds
+            end_t = current_time + dur
             current_time = end_t
 
             # Format start and end as HH:MM:SS,mmm
@@ -389,23 +434,26 @@ class VideoRendererService:
         self,
         storyboard: Storyboard,
         video_id: str,
-        aspect_ratio: Optional[str] = None
+        aspect_ratio: Optional[str] = None,
+        enable_tts: bool = False,
+        audio_mode: str = "ambient"
     ) -> VideoRenderStatus:
         """
         Assemble all visual cards, audio timeline, and subtitles into a broadcast-ready MP4.
         """
         ar = aspect_ratio or storyboard.aspect_ratio or "16:9"
         created_at = datetime.utcnow().isoformat()
-        total_duration = sum(s.estimated_duration_seconds for s in storyboard.scenes)
 
         out_mp4 = self.exports_dir / f"{video_id}.mp4"
+        audio_used_is_tts = False
 
         with tempfile.TemporaryDirectory() as td:
             temp_dir = Path(td)
             clip_paths: List[Path] = []
+            scene_durations: List[float] = []
 
             for i, scene in enumerate(storyboard.scenes, start=1):
-                scene_dur = max(4, scene.estimated_duration_seconds)
+                base_dur = max(4, scene.estimated_duration_seconds)
                 img_path = temp_dir / f"scene_{i:02d}.png"
                 wav_path = temp_dir / f"scene_{i:02d}.wav"
                 clip_mp4 = temp_dir / f"clip_{i:02d}.mp4"
@@ -419,12 +467,30 @@ class VideoRendererService:
                     output_file=img_path
                 )
 
-                # 2. Render Audio Track
-                self.generate_ambient_scene_audio(
-                    duration_seconds=scene_dur,
-                    output_file=wav_path,
-                    scene_idx=i
-                )
+                # 2. Render Audio Track (TTS or Ambient Chime)
+                actual_dur = float(base_dur)
+                if enable_tts or audio_mode == "tts":
+                    tts_text = scene.narration
+                    if scene.character_dialogue:
+                        tts_text += f". {scene.character_dialogue}"
+                    tts_dur = self.generate_scene_narration_tts(tts_text, wav_path)
+                    if tts_dur is not None:
+                        audio_used_is_tts = True
+                        actual_dur = max(actual_dur, math.ceil(tts_dur + 0.6))
+                    else:
+                        self.generate_ambient_scene_audio(
+                            duration_seconds=int(actual_dur),
+                            output_file=wav_path,
+                            scene_idx=i
+                        )
+                else:
+                    self.generate_ambient_scene_audio(
+                        duration_seconds=int(actual_dur),
+                        output_file=wav_path,
+                        scene_idx=i
+                    )
+
+                scene_durations.append(actual_dur)
 
                 # 3. Create Scene MP4 Clip via FFmpeg
                 cmd = [
@@ -434,6 +500,7 @@ class VideoRendererService:
                     "-c:v", "libx264", "-tune", "stillimage",
                     "-c:a", "aac", "-b:a", "192k",
                     "-pix_fmt", "yuv420p",
+                    "-t", str(actual_dur),
                     "-shortest",
                     str(clip_mp4)
                 ]
@@ -463,9 +530,9 @@ class VideoRendererService:
                 logger.error(f"FFmpeg concat error: {res_c.stderr}")
                 raise RuntimeError(f"FFmpeg failed concatenation: {res_c.stderr[:200]}")
 
-            # 5. Generate and Mux Subtitles
+            # 5. Generate and Mux Subtitles (Precisely synchronized with actual durations)
             srt_path = temp_dir / "subtitles.srt"
-            self.generate_subtitles_srt(storyboard.scenes, srt_path)
+            self.generate_subtitles_srt(storyboard.scenes, srt_path, durations=scene_durations)
 
             # Mux subtitles as mov_text track into final MP4
             cmd_final = [
@@ -489,8 +556,8 @@ class VideoRendererService:
                 shutil.copy2(out_mp4, d / "chronicle_demo_video.mp4")
             logger.info("Successfully exported primary demo video to demo_output/chronicle_demo_video.mp4")
 
-
         file_size = os.path.getsize(out_mp4) if out_mp4.exists() else 0
+        total_duration = sum(scene_durations)
 
         return VideoRenderStatus(
             video_id=video_id,
@@ -505,7 +572,9 @@ class VideoRendererService:
             download_url=f"/api/videos/{video_id}/download",
             stream_url=f"/api/videos/{video_id}/stream",
             created_at=created_at,
-            total_scenes=len(storyboard.scenes)
+            total_scenes=len(storyboard.scenes),
+            audio_track_type="spoken_narration_tts" if audio_used_is_tts else "background_ambient_chime",
+            subtitles_synchronized=True
         )
 
 

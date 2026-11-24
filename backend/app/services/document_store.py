@@ -23,6 +23,19 @@ class DocumentStore:
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._init_db()
 
+    def rebind(self, db_path: Path):
+        """Rebind document store to another SQLite database file (used for isolated testing)."""
+        self.db_path = db_path
+        self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        self._init_db()
+
+    def clear(self):
+        """Remove all documents and chunks from the store."""
+        with self._get_connection() as conn:
+            conn.execute("DELETE FROM document_chunks;")
+            conn.execute("DELETE FROM documents;")
+            conn.commit()
+
     def _get_connection(self) -> sqlite3.Connection:
         conn = sqlite3.connect(str(self.db_path), timeout=30.0)
         conn.row_factory = sqlite3.Row

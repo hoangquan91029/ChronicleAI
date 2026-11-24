@@ -92,12 +92,14 @@ class ChronicleOfflineRuleEngine(BaseLLMProvider):
         facts: List[str] = []
         citations: List[Citation] = []
 
+        q_words = set(re.findall(r"\w+", question.lower()))
         for chunk in top_chunks:
             citations.append(chunk.citation)
-            # Take key sentences from chunk
+            # Find the sentence in chunk most relevant to the question
             sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+", chunk.text) if len(s.strip()) > 15]
             if sentences:
-                facts.append(f"{sentences[0]} (Nguồn: {chunk.source}, Trang {chunk.page})")
+                best_sent = max(sentences, key=lambda s: len(q_words.intersection(set(re.findall(r"\w+", s.lower())))))
+                facts.append(f"{best_sent} (Nguồn: {chunk.source}, Trang {chunk.page})")
 
         joined_facts = "\n- ".join(facts)
         answer = (

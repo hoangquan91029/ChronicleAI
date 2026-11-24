@@ -93,7 +93,9 @@ async def render_video(req: VideoRenderRequest):
         status = global_video_renderer.render_storyboard_to_video(
             storyboard=storyboard,
             video_id=video_id,
-            aspect_ratio=req.aspect_ratio
+            aspect_ratio=req.aspect_ratio,
+            enable_tts=req.enable_tts,
+            audio_mode=req.audio_mode
         )
         video_registry[video_id] = status
         video_registry["latest"] = status

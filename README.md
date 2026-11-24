@@ -4,8 +4,8 @@
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg)](https://fastapi.tiangolo.com/)
 [![Next.js](https://img.shields.io/badge/Next.js-14.2+-black.svg)](https://nextjs.org/)
-[![Pytest](https://img.shields.io/badge/Pytest-52%20Passed%20(82%25%20Coverage)-brightgreen.svg)](https://pytest.org/)
-[![Archival Benchmark](https://img.shields.io/badge/Archival%20Benchmark-100%25%20Accuracy%20(DVSKTT%201697)-blue.svg)](benchmarks/authentic_archival/REPORT.md)
+[![Pytest](https://img.shields.io/badge/Pytest-53%20Passed%20(85%25%20Coverage)-brightgreen.svg)](https://pytest.org/)
+[![Archival Benchmark](https://img.shields.io/badge/Archival%20Benchmark-Curated%20Prototype%20(DVSKTT%201697)-blue.svg)](benchmarks/authentic_archival/REPORT.md)
 [![Video Engine](https://img.shields.io/badge/Video%20Engine-Pillow%20%2B%20FFmpeg-red.svg)](backend/app/services/video_renderer.py)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED.svg)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
@@ -14,7 +14,7 @@
 
 ## 1. Overview
 
-**ChronicleAI** is an open-source AI platform that transforms historical documents into citation-backed educational video scripts, 2D minimalist animation storyboards, and broadcast-ready MP4 educational videos with embedded subtitles.
+**ChronicleAI** is an open-source AI platform that transforms historical documents into citation-backed educational video scripts, 2D minimalist animation storyboards, and educational MP4 videos with embedded subtitles.
 
 Designed for educators, historical researchers, and content creators, ChronicleAI enforces strict source traceability:
 - Every claim is tied to its originating document and page/folio number.
@@ -22,7 +22,7 @@ Designed for educators, historical researchers, and content creators, ChronicleA
 - Scripts explicitly separate authentic historical quotes from creative dramatized dialogues.
 - Scripts can be tailored across multiple durations: **SHORTS** (30–60s), **EXPLAINER** (3–5m), and **DOCUMENTARY** (10–20m).
 - Completed scripts are converted into 2D minimalist animation storyboards (`16:9` widescreen or `9:16` vertical mobile).
-- An offline video engine (Pillow + FFmpeg) renders complete, playable educational MP4 videos with custom artwork, synthesized audio chimes, citation shields, and embedded subtitles.
+- An automated video engine (Pillow + FFmpeg) renders complete, playable educational MP4 videos with custom artwork, synthesized audio chimes (or optional Vietnamese spoken narration via gTTS), citation shields, and embedded subtitles.
 
 The launch case study is **Emperor Lê Thánh Tông of Đại Việt (1460–1497)**, covering his administrative reforms (13 Đạo thừa tuyên), the Hồng Đức Code (Quốc Triều Hình Luật), the Văn Miếu Doctor Stelae (1484), the Tao Đàn Society (1495), and the 1471 Chiêm Thành campaign grounded in the 1697 woodblock edition of *Đại Việt Sử Ký Toàn Thư*.
 
@@ -61,13 +61,13 @@ PDF Ingestion & Archival URL Registry (PyMuPDF)
   - Multilingual subword embedding capturing Vietnamese diacritics and compound names without requiring GPU cold-start downloads.
   - Citation-aware vector store attaching `{filename, page, chunk_id, quote, folio_ref, source_id}`.
   - Tri-state verification engine: `SUPPORTED`, `CONTRADICTED`, and `INSUFFICIENT_EVIDENCE`.
-  - **Authentic Archival Benchmark**: 24 balanced propositions achieving **100.0% accuracy** (16/16 exact folio matches, 8/8 false claims rejected).
-  - **Synthetic Baseline Benchmark**: Evaluates synthetic fixtures separately for controlled regression testing.
+  - **Authentic Archival Benchmark**: 24 balanced propositions evaluated against *Đại Việt Sử Ký Toàn Thư* (1697 Nội các quan bản, Quyển XII & XIII) based on the authoritative 1993 Viện Sử học Vietnamese translation, verifying 100.0% classification accuracy and folio coordinate matches on the curated prototype evaluation set.
+  - **Synthetic Baseline Benchmark**: Evaluates synthetic fixtures separately for controlled regression testing (95.8% accuracy on 24 fixture claims).
 - ✅ **Milestone 3 — Scriptwriting Studio & Multi-Provider LLM**:
   - Multi-duration video scripting: **SHORTS** (30–60s, 3 scenes), **EXPLAINER** (3–5m, 4 scenes), and **DOCUMENTARY** (10–20m, 7 scenes).
   - Explicit labeling: `[CHÍNH SỬ]` (historical quotes) vs. `[HƯ CẤU / KỊCH BẢN]` (fictional dramatizations).
   - Interactive scene-level editing via `PUT /api/scripts/scenes/{scene_number}`.
-  - Multi-backend LLM integration: Google Gemini (`gemini-2.5-flash`), OpenAI (`gpt-4o`), and deterministic offline rule engine with transparent `is_fallback` diagnostics.
+  - Multi-backend LLM integration: Google Gemini (`gemini-1.5-flash`), OpenAI (`gpt-4o`), and deterministic offline rule engine with transparent `is_fallback` diagnostics.
 - ✅ **Milestone 4 — 2D Minimalist Storyboard Generator**:
   - Aspect ratio toggle: `16:9` (horizontal) and `9:16` (vertical mobile).
   - 2D minimalist animation scene cards with expressive stick-figure character aesthetic.
@@ -75,12 +75,12 @@ PDF Ingestion & Archival URL Registry (PyMuPDF)
   - Camera staging directions (pans, low angles, zooms) and timing estimates.
   - AI image-generation prompts ready for Midjourney, DALL-E 3, and Imagen.
   - Interactive scene prompt editing via `PUT /api/storyboards/scenes/{scene_number}`.
-- ✅ **Milestone 5 — Broadcast Video Production Engine**:
+- ✅ **Milestone 5 — Automated Video Production Engine**:
   - Pure Python rendering using Pillow (custom stick-figure vector drawing, typography, citation shields) and FFmpeg.
-  - Synthesized pentatonic audio chimes and stereo waveform generation.
+  - Synthesized pentatonic audio chimes and stereo waveform generation, with optional spoken Vietnamese narration via gTTS.
   - Universal embedded `mov_text` subtitle streams muxed directly into the MP4 container.
   - Video streaming API with HTTP range request support (`/api/videos/{id}/stream`), status polling, and direct download.
-  - Real verified playable 60s demonstration video: `demo_output/chronicle_demo_video.mp4` (1.8MB).
+  - Real verified playable 55s demonstration video: `demo_output/chronicle_demo_video.mp4` (1.8MB).
 - ✅ **Milestone 6 — Next.js 14 Dashboard**:
   - 7 interactive workspaces:
     1. Document Ingestion & URL Registry

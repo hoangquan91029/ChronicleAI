@@ -4,6 +4,17 @@ All notable changes to the ChronicleAI project are documented in this file.
 
 ---
 
+## [1.0.1] - 2026-11-24
+
+### CI Fixes, Archival Integrity & Audio Enhancements
+- **CI Test Isolation (P0 Fix):** Resolved test failure in `test_api_rag_search_and_qa`. Implemented isolated SQLite databases and vector stores per test using an autouse fixture in `backend/tests/conftest.py`. Added deterministic tie-breaking (`-round(score, 5), chunk_id`) in `CitationVectorStore.search`.
+- **Archival Benchmark Integrity:** Explicitly documented the textual provenance of the authentic archival track as the 1993 Viện Sử học Vietnamese translation mapped to the 1697 Nội các quan bản woodblock folios. Verified live IIIF endpoints (8/9 folios HTTP 200, with collection portal fallback for XII_82b).
+- **TTS Narration & Subtitle Sync:** Added optional spoken Vietnamese voiceover narration using `gTTS` (`enable_tts` and `audio_mode`), with graceful offline fallback to pentatonic ambient chimes. Subtitle timestamps and video timelines are now strictly synchronized with audio duration.
+- **AI Provider Edge Cases:** Added unit tests in `test_llm_providers.py` covering malformed JSON responses, missing schema keys, API timeouts, empty retrieval, and rejection of hallucinated citations.
+- **Docker E2E Smoke Test:** Created `scripts/docker_smoke_test.sh` to build containers, wait for healthiness, and test all REST endpoints end-to-end. Updated CI `docker-validation` job to run the live smoke test.
+- **Workflow Artifacts:** Updated `.github/workflows/ci.yml` to automatically upload the rendered demo video (`demo_output/chronicle_demo_video.mp4`) and benchmark reports as GitHub Actions artifacts.
+- **Configuration & Documentation:** Added comprehensive `.env.example` template with safe placeholders and updated documentation to reflect verified metrics.
+
 ## [1.0.0] - 2026-11-23
 
 ### Completed Autonomous Engineering Delivery

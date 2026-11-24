@@ -196,3 +196,68 @@ async def test_openai_verify_claim_mock():
         assert verif.provider_diagnostics["is_fallback"] is False
         assert "openai" in verif.provider_diagnostics["provider"]
 
+
+@pytest.mark.asyncio
+async def test_llm_edge_cases_and_fallbacks():
+    """Verify robust edge case handling: malformed JSON, empty chunks, timeouts, and ungrounded claims."""
+    gemini = GeminiLLMProvider(api_key="test-key", model="gemini-1.5-flash")
+    openai = OpenAILLMProvider(api_key="test-key", model="gpt-4o")
+
+    # 1. Empty retrieval chunks
+    res_gemini_empty = await gemini.verify_claim("Vua Lê Thánh Tông du học tại Pháp năm 1470.", [])
+    assert res_gemini_empty.status.value == "INSUFFICIENT_EVIDENCE"
+    assert len(res_gemini_empty.citations) == 0
+    assert res_gemini_empty.provider_diagnostics["is_fallback"] is True
+
+    res_openai_empty = await openai.verify_claim("Đại Việt chế tạo tàu hỏa năm 1480.", [])
+    assert res_openai_empty.status.value == "INSUFFICIENT_EVIDENCE"
+    assert len(res_openai_empty.citations) == 0
+    assert res_openai_empty.provider_diagnostics["is_fallback"] is True
+
+    # 2. Malformed JSON from Gemini -> triggers fallback
+    mock_bad_json = MagicMock()
+    mock_bad_json.status_code = 200
+    mock_bad_json.json.return_value = {
+        "candidates": [{"content": {"parts": [{"text": "THIS IS NOT VALID JSON {status: true"}]}}]
+    }
+    chunk = create_sample_chunk("c1", 1, "Năm 1460, Hoàng đế Lê Thánh Tông lên ngôi ở tuổi 18.")
+    with patch("httpx.AsyncClient.post", new_callable=AsyncMock) as mock_post:
+        mock_post.return_value = mock_bad_json
+        res_bad = await gemini.verify_claim("Lê Thánh Tông lên ngôi năm 1460", [chunk])
+        assert res_bad.status.value == "SUPPORTED"
+        assert res_bad.provider_diagnostics["is_fallback"] is True
+        assert res_bad.provider_diagnostics["provider"] == "offline_fallback"
+
+    # 3. Missing/Invalid fields in Gemini JSON -> defaults safely
+    mock_missing_fields = MagicMock()
+    mock_missing_fields.status_code = 200
+    mock_missing_fields.json.return_value = {
+        "candidates": [{"content": {"parts": [{"text": '{"unknown_key": "some text"}'}]}}]
+    }
+    with patch("httpx.AsyncClient.post", new_callable=AsyncMock) as mock_post:
+        mock_post.return_value = mock_missing_fields
+        res_missing = await gemini.verify_claim("Lê Thánh Tông lên ngôi năm 1460", [chunk])
+        assert res_missing.status.value == "INSUFFICIENT_EVIDENCE"
+        assert res_missing.provider_diagnostics["is_fallback"] is False
+
+    # 4. Timeout / HTTP error on OpenAI -> triggers fallback
+    with patch("httpx.AsyncClient.post", new_callable=AsyncMock, side_effect=httpx.ReadTimeout("Timeout from API")):
+        res_timeout = await openai.verify_claim("Lê Thánh Tông lên ngôi năm 1460", [chunk])
+        assert res_timeout.status.value == "SUPPORTED"
+        assert res_timeout.provider_diagnostics["is_fallback"] is True
+        assert res_timeout.provider_diagnostics["provider"] == "offline_fallback"
+
+    # 5. Unsupported / Contradicted claim rejection ensures zero citations attached
+    mock_contradicted = MagicMock()
+    mock_contradicted.status_code = 200
+    mock_contradicted.json.return_value = {
+        "choices": [{"message": {"content": '{"status": "CONTRADICTED", "confidence": 0.98, "explanation": "Vua không hề thất trận.", "has_conflict": true}'}}]
+    }
+    with patch("httpx.AsyncClient.post", new_callable=AsyncMock) as mock_post:
+        mock_post.return_value = mock_contradicted
+        res_contra = await openai.verify_claim("Lê Thánh Tông bị đánh bại năm 1471", [chunk])
+        assert res_contra.status.value == "CONTRADICTED"
+        assert len(res_contra.citations) == 0
+        assert res_contra.provider_diagnostics["is_fallback"] is False
+
+

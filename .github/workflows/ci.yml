@@ -57,6 +57,23 @@ jobs:
           test -s benchmarks/authentic_archival/REPORT.md
           test -s benchmarks/authentic_archival/confusion_matrix.png
 
+      - name: Generate Demonstration Video Artifact
+        run: |
+          python scripts/generate_demo_video.py
+          test -s demo_output/chronicle_demo_video.mp4
+
+      - name: Upload Video and Benchmark Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: chronicle-demo-artifacts
+          path: |
+            demo_output/chronicle_demo_video.mp4
+            demo_output/chunks.json
+            benchmarks/authentic_archival/REPORT.md
+            benchmarks/authentic_archival/confusion_matrix.png
+            benchmarks/synthetic_baseline/REPORT.md
+          if-no-files-found: warn
+
   frontend-build:
     name: Frontend Next.js Build
     runs-on: ubuntu-latest
@@ -79,11 +96,14 @@ jobs:
         run: npm run build
 
   docker-validation:
-    name: Docker Compose Validation
+    name: Docker Compose Validation & Smoke Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Validate Docker Compose Configuration
         run: |
           docker compose config
+      - name: Run Docker Compose End-to-End Smoke Test
+        run: |
+          bash scripts/docker_smoke_test.sh
 

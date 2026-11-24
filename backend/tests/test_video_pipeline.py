@@ -96,6 +96,15 @@ def test_video_renderer_components(sample_storyboard):
         assert status.status == "completed"
         assert status.file_size_bytes > 20000
         assert os.path.exists(status.file_path)
+        assert status.audio_track_type == "background_ambient_chime"
+        assert status.subtitles_synchronized is True
+
+        # Test optional TTS narration helper
+        tts_audio_p = Path(td) / "tts_scene.wav"
+        tts_dur = service.generate_scene_narration_tts("Vua Lê Thánh Tông ban bố chiếu thư.", tts_audio_p)
+        if tts_dur is not None:
+            assert tts_dur > 0
+            assert tts_audio_p.exists()
 
 
 @pytest.mark.asyncio

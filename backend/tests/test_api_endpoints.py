@@ -54,22 +54,71 @@ async def test_api_document_upload_and_chunks():
 async def test_api_rag_search_and_qa():
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
-        # Search
+        # 1. Broad cross-document search (without document filter)
         search_payload = {"query": "Luật Hồng Đức phụ nữ", "top_k": 3}
         search_resp = await client.post("/api/rag/search", json=search_payload)
         assert search_resp.status_code == 200
         search_data = search_resp.json()
         assert search_data["total_matches"] > 0
-        assert search_data["results"][0]["page"] == 2
+        # Check deterministic descending score ranking
+        scores = [r["score"] for r in search_data["results"]]
+        assert scores == sorted(scores, reverse=True)
+        # Verify content relevance
+        assert any("hồng đức" in r["text"].lower() or "phụ nữ" in r["text"].lower() for r in search_data["results"])
 
-        # Grounded Q&A
-        qa_payload = {"question": "Ai là tác giả câu nói Hiền tài là nguyên khí của quốc gia?"}
+        # 2. Scoped document filter search: specifically in sample PDF (doc_le_thanh_tong_001)
+        doc_filter_payload = {
+            "query": "Luật Hồng Đức phụ nữ",
+            "document_id": "doc_le_thanh_tong_001",
+            "top_k": 3
+        }
+        doc_resp = await client.post("/api/rag/search", json=doc_filter_payload)
+        assert doc_resp.status_code == 200
+        doc_data = doc_resp.json()
+        assert doc_data["total_matches"] > 0
+        assert all(r["document_id"] == "doc_le_thanh_tong_001" for r in doc_data["results"])
+        # In sample PDF, administrative and legal reforms are located on page 2
+        assert doc_data["results"][0]["page"] == 2
+        assert "hồng đức" in doc_data["results"][0]["text"].lower()
+
+        # 3. Explicit page range filter
+        page_filter_payload = {
+            "query": "Luật Hồng Đức",
+            "document_id": "doc_le_thanh_tong_001",
+            "min_page": 2,
+            "max_page": 2,
+            "top_k": 3
+        }
+        page_resp = await client.post("/api/rag/search", json=page_filter_payload)
+        assert page_resp.status_code == 200
+        page_data = page_resp.json()
+        assert len(page_data["results"]) > 0
+        assert all(r["page"] == 2 for r in page_data["results"])
+
+        # 4. Source collection filter (Archival collection)
+        src_filter_payload = {
+            "query": "cải cách hành chính 13 đạo thừa tuyên",
+            "source_id": "DVSKTT-1697-NOI-CAC-QUAN-BAN",
+            "top_k": 2
+        }
+        src_resp = await client.post("/api/rag/search", json=src_filter_payload)
+        assert src_resp.status_code == 200
+        src_data = src_resp.json()
+        if src_data["total_matches"] > 0:
+            assert all(r["citation"]["source_id"] == "DVSKTT-1697-NOI-CAC-QUAN-BAN" for r in src_data["results"])
+
+        # 5. Grounded Q&A with document scoping
+        qa_payload = {
+            "question": "Ai là tác giả câu nói Hiền tài là nguyên khí của quốc gia?",
+            "document_id": "doc_le_thanh_tong_001"
+        }
         qa_resp = await client.post("/api/rag/answer", json=qa_payload)
         assert qa_resp.status_code == 200
         qa_data = qa_resp.json()
         assert qa_data["grounded"] is True
         assert len(qa_data["citations"]) > 0
         assert qa_data["citations"][0]["page"] == 3
+        assert "Thân Nhân Trung" in qa_data["answer"]
 
 
 @pytest.mark.asyncio

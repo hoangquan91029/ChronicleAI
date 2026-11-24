@@ -77,8 +77,8 @@ class CitationVectorStore:
             if score >= min_score:
                 results.append((float(score), chunk))
 
-        # Sort descending by similarity score
-        results.sort(key=lambda x: x[0], reverse=True)
+        # Sort descending by similarity score, breaking ties deterministically by chunk_id
+        results.sort(key=lambda x: (-round(x[0], 5), x[1].chunk_id))
         top_results = results[:top_k]
 
         search_results: List[SearchResult] = []

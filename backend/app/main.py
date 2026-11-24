@@ -57,14 +57,17 @@ def ensure_sample_data_loaded():
             try:
                 with open(archive_file, "r", encoding="utf-8") as f:
                     archive_data = json.load(f)
+                import re
                 arch_chunks = []
                 for i, sec in enumerate(archive_data.get("sections", [])):
                     chunk_id = f"chunk_dvsktt_{sec['folio_ref']}"
+                    m_leaf = re.search(r"_(\d+)[ab]?", sec.get("folio_ref", ""))
+                    folio_leaf = int(m_leaf.group(1)) if m_leaf else (i + 1)
                     arch_chunks.append(ChunkMetadata(
                         chunk_id=chunk_id,
                         document_id="doc_dvsktt_1697_bktl",
                         chunk_index=i,
-                        page=sec.get("quyen", 12),
+                        page=folio_leaf,
                         text=sec["text"],
                         source=archive_data["source_title"],
                         word_count=len(sec["text"].split()),
