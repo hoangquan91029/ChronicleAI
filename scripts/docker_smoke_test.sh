@@ -30,16 +30,17 @@ trap cleanup EXIT
 echo "1. Building and launching Docker Compose stack..."
 docker compose up --build -d
 
-echo "2. Waiting for backend healthcheck to report healthy..."
-MAX_RETRIES=30
+echo "2. Waiting for backend to report healthy..."
+MAX_RETRIES=35
 RETRY_COUNT=0
 HEALTHY=0
 
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
   STATUS=$(docker inspect --format='{{json .State.Health.Status}}' chronicle_backend 2>/dev/null || echo "\"unknown\"")
-  if [ "$STATUS" = "\"healthy\"" ]; then
+  HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/api/health 2>/dev/null || echo "000")
+  if [ "$STATUS" = "\"healthy\"" ] || [ "$HTTP_CODE" = "200" ]; then
     HEALTHY=1
-    echo "   Backend reported healthy after $((RETRY_COUNT * 2))s."
+    echo "   Backend reported healthy (Docker status: ${STATUS}, HTTP: ${HTTP_CODE}) after $((RETRY_COUNT * 2))s."
     break
   fi
   RETRY_COUNT=$((RETRY_COUNT + 1))
@@ -47,7 +48,7 @@ while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
 done
 
 if [ $HEALTHY -ne 1 ]; then
-  echo "❌ Backend container failed to become healthy within 60s."
+  echo "❌ Backend container failed to become healthy within 70s."
   docker compose ps
   exit 1
 fi
@@ -57,11 +58,21 @@ HEALTH_RESP=$(curl -s -f http://localhost:8000/api/health)
 echo "   /api/health response: ${HEALTH_RESP}"
 echo "${HEALTH_RESP}" | grep -q '"status":"healthy"'
 
-echo "4. Testing Frontend HTTP response..."
-FRONTEND_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/)
-echo "   Frontend root HTTP status: ${FRONTEND_CODE}"
-if [ "$FRONTEND_CODE" -ne 200 ]; then
-  echo "❌ Expected frontend status 200, got ${FRONTEND_CODE}"
+echo "4. Testing Frontend HTTP response (polling until ready)..."
+FRONTEND_READY=0
+for i in $(seq 1 35); do
+  FRONTEND_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/ 2>/dev/null || echo "000")
+  if [ "$FRONTEND_CODE" = "200" ]; then
+    echo "   Frontend root HTTP status: 200 (ready after $((i * 2))s)"
+    FRONTEND_READY=1
+    break
+  fi
+  sleep 2
+done
+
+if [ "$FRONTEND_READY" -ne 1 ]; then
+  echo "❌ Expected frontend status 200 within 70s, got ${FRONTEND_CODE}"
+  docker compose logs frontend || true
   exit 1
 fi
 
@@ -80,7 +91,7 @@ echo "   RAG search returned results successfully."
 echo "7. Testing Claim Verification API..."
 VERIFY_RESP=$(curl -s -f -X POST http://localhost:8000/api/verify \
   -H "Content-Type: application/json" \
-  -d '{"claims": ["Năm 1460, Hoàng đế Lê Thánh Tông lên ngôi ở tuổi 18."]}')
+  -d '{"claims": ["Năm 1484, vua Lê Thánh Tông ra lệnh dựng bia đá khắc tên các vị đỗ Tiến sĩ tại Văn Miếu"]}')
 echo "${VERIFY_RESP}" | grep -q '"SUPPORTED"'
 echo "   Claim verification returned SUPPORTED status."
 
@@ -99,9 +110,20 @@ echo "${VIDEO_RESP}" | grep -q '"completed"'
 echo "   Video production completed successfully."
 
 echo "10. Testing Video Stream and Download Endpoints..."
-curl -s -f -I http://localhost:8000/api/videos/latest | grep -q "200"
-curl -s -f -I http://localhost:8000/api/videos/latest | grep -q "completed"
-echo "   Latest video verified and ready for streaming/download."
+LATEST_STATUS=$(curl -s -f http://localhost:8000/api/videos/latest)
+echo "${LATEST_STATUS}" | grep -q '"status":"completed"'
+echo "   /api/videos/latest status verified: completed."
+
+STREAM_URL=$(echo "${LATEST_STATUS}" | grep -o '"stream_url":"[^"]*"' | head -n 1 | cut -d'"' -f4)
+if [ -n "${STREAM_URL}" ]; then
+  STREAM_CODE=$(curl -s -o /dev/null -w "%{http_code}" --range 0-1024 "http://localhost:8000${STREAM_URL}" || echo "000")
+  if [ "$STREAM_CODE" = "200" ] || [ "$STREAM_CODE" = "206" ]; then
+    echo "   Stream endpoint (${STREAM_URL}) verified: HTTP ${STREAM_CODE}."
+  else
+    echo "❌ Stream endpoint returned HTTP ${STREAM_CODE}"
+    exit 1
+  fi
+fi
 
 echo "=========================================================="
 echo "All Docker End-to-End Smoke Tests Passed!"

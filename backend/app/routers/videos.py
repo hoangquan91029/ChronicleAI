@@ -185,7 +185,7 @@ async def get_video_status(video_id: str):
     return video_registry[video_id]
 
 
-@router.get("/{video_id}/download")
+@router.api_route("/{video_id}/download", methods=["GET", "HEAD"])
 async def download_video(video_id: str):
     """Download the completed MP4 video file."""
     # Check demo alias
@@ -211,7 +211,7 @@ async def download_video(video_id: str):
     )
 
 
-@router.get("/{video_id}/stream")
+@router.api_route("/{video_id}/stream", methods=["GET", "HEAD"])
 async def stream_video(video_id: str):
     """Stream MP4 video directly for HTML5 inline video players."""
     if video_id == "demo_le_thanh_tong":

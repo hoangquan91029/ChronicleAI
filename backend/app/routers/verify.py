@@ -6,6 +6,7 @@ router = APIRouter(prefix="/api/verify", tags=["Claim Verification"])
 verifier = ClaimVerifier()
 
 
+@router.post("", response_model=ClaimVerificationResponse)
 @router.post("/claims", response_model=ClaimVerificationResponse)
 async def verify_historical_claims(req: ClaimVerificationRequest):
     """
