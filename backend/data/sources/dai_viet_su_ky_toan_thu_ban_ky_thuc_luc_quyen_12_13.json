@@ -1,0 +1,93 @@
+{
+  "source_id": "DVSKTT-1697-NOI-CAC-QUAN-BAN",
+  "source_title": "Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục (Quyển XII & XIII)",
+  "original_edition": "Nội các quan bản (1697, triều Chính Hòa)",
+  "reign": "Lê Thánh Tông (1460–1497)",
+  "digital_archive_url": "https://www.digitizingvietnam.com/vi/our-collections/dai-viet-su-ky-toan-thu/ban-ky-thuc-luc",
+  "iiif_base_url": "https://iiif.digitizingvietnam.com/iiif/2/ban-ky-thuc-luc",
+  "license": "Public Domain (Historical Chronicle) / Research Non-Commercial Use",
+  "editorial_translation": "Bản dịch Viện Sử học Việt Nam (1993), Dịch giả Hoàng Văn Lâu & Ngô Đức Thọ, Hiệu đính GS. Hà Văn Tấn",
+  "sections": [
+    {
+      "quyen": 12,
+      "folio_ref": "XII_1a_1b",
+      "year": 1460,
+      "lunar_date": "Năm Canh Thìn, Quang Thuận năm thứ 1, Tháng 6",
+      "historical_topic": "Đăng cơ và cải nguyên niên hiệu Quang Thuận",
+      "iiif_image_url": "https://iiif.digitizingvietnam.com/iiif/2/ban-ky-thuc-luc/quyen12/DVSKTT_ban_thuc_XII_1a.jpg/full/full/0/default.jpg",
+      "text": "Mùa hạ, tháng 6, ngày mồng 6 năm Canh Thìn (1460), sau khi bọn đại nghịch Đỗ Bí, Lê Ngang mưu trừ nghịch đảng Nghi Dân, đại thần Thái bảo Nguyễn Xí, Thái phó Đinh Liệt cùng triều thần nghênh đón hoàng tử Tư Thành tại điện Tường Quang, tôn lập lên ngôi hoàng đế. Vua húy Tư Thành, con thứ tư của Thái Tông Văn Hoàng Đế, mẹ là Quang Thục hoàng thái hậu Ngô thị. Đại xá thiên hạ, cải nguyên niên hiệu là Quang Thuận năm thứ nhất, đặt nền móng kiến thiết thái bình thịnh trị cho muôn dân Đại Việt."
+    },
+    {
+      "quyen": 12,
+      "folio_ref": "XII_31b_33a",
+      "year": 1466,
+      "lunar_date": "Năm Bính Tuất, Quang Thuận năm thứ 7",
+      "historical_topic": "Cải cách hành chính: Lục Bộ, Lục Khoa và 13 Đạo Thừa Tuyên",
+      "iiif_image_url": "https://iiif.digitizingvietnam.com/iiif/2/ban-ky-thuc-luc/quyen12/DVSKTT_ban_thuc_XII_31b.jpg/full/full/0/default.jpg",
+      "text": "Năm Bính Tuất (1466), Hoàng đế Lê Thánh Tông tiến hành cải tổ quy mô lớn bộ máy chính quyền trung ương và địa phương. Triều đình chính thức bãi bỏ chức vị Tể tướng cùng các phẩm hàm Tam công, Tam thiếu của tiền triều nhằm tập trung toàn bộ quyền lực tối cao về tay Hoàng đế. Bộ máy trung ương được chia thành Lục Bộ (Lại, Hộ, Lễ, Binh, Hình, Công) trực tiếp nhận chỉ dụ của nhà vua, đặt Lục Khoa chuyên trách giám sát Lục Bộ và Lục Tự phụ trách lễ nghi tự sự. Ở địa phương, chia cả nước thành 12 Đạo thừa tuyên (đến năm 1471 lập thêm đạo thứ 13 là Quảng Nam), mỗi đạo đặt Tam ty cai quản độc lập gồm Đô ty coi việc quân sự, Thừa ty coi việc dân chính và Hiến ty coi việc giám sát thanh tra tư pháp."
+    },
+    {
+      "quyen": 12,
+      "folio_ref": "XII_52a_53b",
+      "year": 1467,
+      "lunar_date": "Năm Đinh Hợi, Quang Thuận năm thứ 8",
+      "historical_topic": "Chính sách đê điều nông nghiệp và lập chức Hà đê quan",
+      "iiif_image_url": "https://iiif.digitizingvietnam.com/iiif/2/ban-ky-thuc-luc/quyen12/DVSKTT_ban_thuc_XII_52a.jpg/full/full/0/default.jpg",
+      "text": "Năm Đinh Hợi (1467), nhà vua hạ lệnh đặt chức Hà đê quan (Hà đê sứ) và Khuyến nông sứ tại các đạo thừa tuyên ven sông Hồng và sông Mã. Ban hành chi tiết các điều lệ đắp đê ngăn lũ, bắt đầu khởi công từ tiết đầu xuân. Quan lại địa phương có bổn phận đôn đốc nông dân tu sửa đê điều; nếu để nước lũ vỡ đê ngập úng lúa má hoa màu thì quan lại sở tại bị xử phạt trượng giáng chức thích đáng. Triều đình khuyến khích khai hoang mở mang đồn điền mở rộng diện tích canh tác."
+    },
+    {
+      "quyen": 12,
+      "folio_ref": "XII_65b_68a",
+      "year": 1471,
+      "lunar_date": "Năm Tân Mão, Hồng Đức năm thứ 2, Tháng 2",
+      "historical_topic": "Chiến dịch Nam chinh và thu phục đất đai lập đạo Quảng Nam",
+      "iiif_image_url": "https://iiif.digitizingvietnam.com/iiif/2/ban-ky-thuc-luc/quyen12/DVSKTT_ban_thuc_XII_65b.jpg/full/full/0/default.jpg",
+      "text": "Năm Canh Dần (1470) - Tân Mão (1471), vua Chiêm Thành là Trà Toàn đem quân xâm lấn biên cương Hóa Châu. Tháng 11 năm Canh Dần, vua Lê Thánh Tông ban bố chiếu thân chinh, đích thân thống lĩnh 26 vạn thủy bộ đại quân tiến về phương Nam. Đến tháng 2 năm Tân Mão (1471), quân Đại Việt đại thắng vang dội, công phá thành Chà Bàn (Vijaya), bắt sống Trà Toàn đem về Thăng Long. Vua hạ lệnh thu phục toàn bộ cương vực đất đai cũ, sáp nhập vào lãnh thổ Đại Việt và lập nên đạo thừa tuyên thứ 13 là đạo Quảng Nam cùng vệ Thăng Hoa."
+    },
+    {
+      "quyen": 12,
+      "folio_ref": "XII_82b",
+      "year": 1473,
+      "lunar_date": "Năm Quý Tỵ, Hồng Đức năm thứ 4, Tháng 4",
+      "historical_topic": "Lời căn dặn cương quyết bảo vệ từng thước núi tấc sông bờ cõi",
+      "iiif_image_url": "https://iiif.digitizingvietnam.com/iiif/2/ban-ky-thuc-luc/quyen12/DVSKTT_ban_thuc_XII_82b.jpg/full/full/0/default.jpg",
+      "text": "Năm Quý Tỵ (1473), tháng 4, vua sai Thái bảo Kiến Dương bá Lê Cảnh Huy cùng sứ bộ sang phương Bắc tranh biện cương vực biên giới. Trước lúc lên đường, Hoàng đế Lê Thánh Tông nghiêm khắc truyền khẩu dụ: 'Một thước núi, một tấc sông của ta, lẽ nào lại nên tự tiện vứt bỏ? Ngươi phải kiên quyết tranh biện, chớ cho họ lấn dần. Nếu họ không nghe, còn có thể sai sứ sang phương Bắc bày tỏ rõ điều ngay lẽ gian. Nếu ngươi dám đem một thước núi, một tấc đất của Thái Tổ làm mồi cho giặc, thì tội phải tru di!'."
+    },
+    {
+      "quyen": 13,
+      "folio_ref": "XIII_24a_25b",
+      "year": 1484,
+      "lunar_date": "Năm Giáp Thìn, Hồng Đức năm thứ 15, Tháng 3",
+      "historical_topic": "Dựng bia Tiến sĩ Văn Miếu và tư tưởng Hiền tài là nguyên khí quốc gia",
+      "iiif_image_url": "https://iiif.digitizingvietnam.com/iiif/2/ban-ky-thuc-luc/quyen13/DVSKTT_ban_thuc_XIII_24a.jpg/full/full/0/default.jpg",
+      "text": "Mùa xuân tháng 3 năm Giáp Thìn (1484), vua Lê Thánh Tông ban chỉ dụ cho dựng bia đá đề danh tiến sĩ tại Văn Miếu - Quốc Tử Giám Hà Nội, khắc tên các bậc đỗ đại khoa từ khoa thi Nhâm Tuất (1442) triều Thái Tông trở đi. Hàn lâm viện thị độc Đông các đại học sĩ Thân Nhân Trung vâng sắc soạn bài văn bia danh tiếng muôn đời: 'Hiền tài là nguyên khí của quốc gia, nguyên khí thịnh thì thế nước mạnh, rồi lên cao, nguyên khí suy thì thế nước yếu, rồi xuống thấp. Vì thế các đấng thánh đế minh vương chẳng ai không lấy việc bồi dưỡng nhân tài, kén chọn kẻ sĩ, vun trồng nguyên khí làm việc đầu tiên'."
+    },
+    {
+      "quyen": 13,
+      "folio_ref": "XIII_45a_46b",
+      "year": 1490,
+      "lunar_date": "Năm Canh Tuất, Hồng Đức năm thứ 21, Tháng 4",
+      "historical_topic": "Hoàn thành biên soạn và ấn hành Hồng Đức Bản Đồ",
+      "iiif_image_url": "https://iiif.digitizingvietnam.com/iiif/2/ban-ky-thuc-luc/quyen13/DVSKTT_ban_thuc_XIII_45a.jpg/full/full/0/default.jpg",
+      "text": "Tháng 4 năm Canh Tuất (1490), triều đình Lê Thánh Tông hoàn thành việc biên soạn tổng tập địa lý bản đồ quốc gia mang tên Hồng Đức Bản Đồ. Đây là bộ bản đồ địa dư đầu tiên trong lịch sử ghi nhận toàn diện ranh giới lãnh thổ kinh thành Thăng Long, 13 đạo thừa tuyên cùng các vùng đồi núi, sông ngòi, duyên hải và các hải đảo ngoài khơi của đất nước Đại Việt."
+    },
+    {
+      "quyen": 13,
+      "folio_ref": "XIII_61a_62b",
+      "year": 1495,
+      "lunar_date": "Năm Ất Mão, Hồng Đức năm thứ 26",
+      "historical_topic": "Thành lập Hội Tao Đàn Nhị Thập Bát Tú và sáng tác thi văn",
+      "iiif_image_url": "https://iiif.digitizingvietnam.com/iiif/2/ban-ky-thuc-luc/quyen13/DVSKTT_ban_thuc_XIII_61a.jpg/full/full/0/default.jpg",
+      "text": "Năm Ất Mão (1495), Hoàng đế Lê Thánh Tông sáng lập Hội Tao Đàn tại Thăng Long, còn gọi là Tao Đàn Nhị Thập Bát Tú. Vua tự phong làm Tao Đàn đô nguyên súy, chọn 28 vị đại thần nho học tài năng bậc nhất đương thời như Thân Nhân Trung, Đỗ Nhuận làm phó nguyên súy và tao đàn học sĩ, cùng nhau xướng họa văn chương, biên soạn tập thơ Quỳnh Uyển Cửu Ca, thúc đẩy nền văn học thi ca chữ Hán và chữ Nôm Đại Việt đạt đỉnh cao."
+    },
+    {
+      "quyen": 13,
+      "folio_ref": "XIII_74a_75b",
+      "year": 1483,
+      "lunar_date": "Năm Quý Mão, Hồng Đức năm thứ 14",
+      "historical_topic": "Ban hành Bộ Quốc Triều Hình Luật (Luật Hồng Đức) bảo vệ phụ nữ",
+      "iiif_image_url": "https://iiif.digitizingvietnam.com/iiif/2/ban-ky-thuc-luc/quyen13/DVSKTT_ban_thuc_XIII_74a.jpg/full/full/0/default.jpg",
+      "text": "Dưới triều Hồng Đức, nhà vua cho điển chế hóa bộ Quốc Triều Hình Luật gồm 6 quyển, 722 điều luật mẫu mực. Bộ luật Hồng Đức không chỉ củng cố trật tự vương triều mà còn mang tư tưởng nhân văn sâu sắc: bảo vệ quyền lợi của phụ nữ trong việc thừa kế tài sản hương hỏa của gia đình, công nhận quyền sở hữu tài sản riêng của người vợ khi ly hôn, và nghiêm trị các tội phạm bạo lực hoặc phụ bạc đối với phụ nữ trong xã hội Đại Việt."
+    }
+  ]
+}

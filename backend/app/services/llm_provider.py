@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 import os
@@ -8,7 +9,7 @@ import httpx
 from app.config import settings
 from app.models.rag import Citation, SearchResult
 from app.models.verification import VerificationLabel, SingleClaimVerification, HistoricalDisagreement
-from app.models.script import VideoScript, ScriptScene, DialogueLine, DialogueType, SceneType
+from app.models.script import VideoScript, ScriptScene, DialogueLine, DialogueType, SceneType, ScriptFormat
 from app.models.storyboard import Storyboard, StoryboardScene
 
 logger = logging.getLogger(__name__)
@@ -32,16 +33,19 @@ class BaseLLMProvider:
     async def generate_script(
         self,
         subject: str,
-        target_minutes: int,
-        chunks: List[SearchResult]
+        target_minutes: float,
+        chunks: List[SearchResult],
+        format: Optional[str] = None
     ) -> VideoScript:
         raise NotImplementedError
 
     async def generate_storyboard(
         self,
-        script: VideoScript
+        script: VideoScript,
+        aspect_ratio: str = "16:9"
     ) -> Storyboard:
         raise NotImplementedError
+
 
 
 class ChronicleOfflineRuleEngine(BaseLLMProvider):
@@ -88,12 +92,14 @@ class ChronicleOfflineRuleEngine(BaseLLMProvider):
         facts: List[str] = []
         citations: List[Citation] = []
 
+        q_words = set(re.findall(r"\w+", question.lower()))
         for chunk in top_chunks:
             citations.append(chunk.citation)
-            # Take key sentences from chunk
+            # Find the sentence in chunk most relevant to the question
             sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+", chunk.text) if len(s.strip()) > 15]
             if sentences:
-                facts.append(f"{sentences[0]} (Nguồn: {chunk.source}, Trang {chunk.page})")
+                best_sent = max(sentences, key=lambda s: len(q_words.intersection(set(re.findall(r"\w+", s.lower())))))
+                facts.append(f"{best_sent} (Nguồn: {chunk.source}, Trang {chunk.page})")
 
         joined_facts = "\n- ".join(facts)
         answer = (
@@ -187,7 +193,7 @@ class ChronicleOfflineRuleEngine(BaseLLMProvider):
             (r"\bkhông cần tranh biện\b", "kiên quyết tranh biện"),
             (r"\bcấm vẽ bản đồ\b", "bản đồ"),
             (r"\bthiêu hủy\b", "hoàn thành"),
-            (r"\btrà toàn sáng lập\b", "ông thành lập"),
+            (r"\btrà toàn sáng lập\b", "sáng lập"),
         ]
         if not contradiction_detected:
             for neg_pattern, pos_s in negation_pairs:
@@ -280,25 +286,34 @@ class ChronicleOfflineRuleEngine(BaseLLMProvider):
     async def generate_script(
         self,
         subject: str,
-        target_minutes: int,
-        chunks: List[SearchResult]
+        target_minutes: float,
+        chunks: List[SearchResult],
+        format: Optional[str] = None
     ) -> VideoScript:
         """
-        Generate a comprehensive, 15-20 minute educational video script structured into scenes:
-        - Opening Hook
-        - Historical Background
-        - Chronological Narrative (Accession, Administrative Reforms)
-        - Key Events & Achievements (Hồng Đức Code, Văn Miếu Doctor Stelae, Tao Đàn)
-        - Conflict & Defense (1471 Chiêm Thành Campaign & Sovereign Territorial Oath)
-        - Engaging Conclusion & Historical Legacy
+        Generate an educational video script with selectable formats:
+        - SHORTS (30-60s, punchy 3-scene vertical narrative)
+        - EXPLAINER (3-5m, pedagogical 4-scene overview)
+        - DOCUMENTARY (10-20m, deep 7-scene archival breakdown)
         All scenes feature traceable citations and clearly labeled fictional dialogues.
         """
         # Collect citations
         all_citations: List[Citation] = [c.citation for c in chunks] if chunks else []
         sources_consulted = list(set([c.filename for c in all_citations])) if all_citations else ["Đại Việt Sử Ký Toàn Thư (Bản in khảo cứu)"]
 
+        fmt_str = (format or "").upper()
+        if not fmt_str:
+            if target_minutes <= 1.5:
+                fmt_str = "SHORTS"
+            elif target_minutes <= 5.0:
+                fmt_str = "EXPLAINER"
+            else:
+                fmt_str = "DOCUMENTARY"
+        script_fmt = ScriptFormat(fmt_str) if fmt_str in ScriptFormat.__members__ else ScriptFormat.DOCUMENTARY
+
         # Check if subject is the Le Thanh Tong case study or an arbitrary topic
         is_le_thanh_tong = any(k in subject.lower() for k in ["lê thánh tông", "thánh tông", "hồng đức", "lê tư thành"])
+
 
         if not is_le_thanh_tong and chunks:
             dynamic_scenes: List[ScriptScene] = []
@@ -401,6 +416,214 @@ class ChronicleOfflineRuleEngine(BaseLLMProvider):
             c_list = [c.citation for c in chunks if c.page == page_num]
             return c_list[:2] if c_list else []
 
+        if script_fmt == ScriptFormat.SHORTS:
+            shorts_scenes = [
+                ScriptScene(
+                    scene_number=1,
+                    title="Mở đầu: Vị Hoàng đế & Lời Thề Biên Cương Bất Tử",
+                    scene_type=SceneType.HOOK,
+                    estimated_duration_seconds=15,
+                    historical_setting="Năm 1460, Hoàng thành Thăng Long, lễ đăng quang",
+                    narration=(
+                        "Vị vua nào của Đại Việt từng tuyên bố chém đầu bất kỳ ai dám để mất một tấc đất biên cương? "
+                        "Năm 1460, Hoàng đế Lê Thánh Tông lên ngôi ở tuổi 18 và mở ra thời kỳ thịnh trị rực rỡ nhất lịch sử."
+                    ),
+                    dialogues=[
+                        DialogueLine(
+                            speaker="Vua Lê Thánh Tông",
+                            text="Một thước núi, một tấc sông của ta, lẽ nào lại tự tiện vứt bỏ đi được?",
+                            dialogue_type=DialogueType.HISTORICAL_QUOTE,
+                            is_fictional=False,
+                            citation=get_citations_for_page(5)[0] if get_citations_for_page(5) else None
+                        )
+                    ],
+                    key_historical_facts=["Lê Tư Thành lên ngôi năm 1460."],
+                    citations=get_citations_for_page(1),
+                    needs_review=False
+                ),
+                ScriptScene(
+                    scene_number=2,
+                    title="Bản Đồ Hồng Đức & Đỉnh Cao Văn Trị Võ Công",
+                    scene_type=SceneType.KEY_ACHIEVEMENT,
+                    estimated_duration_seconds=25,
+                    historical_setting="Điện Kính Thiên & Lãnh thổ 13 Đạo Thừa Tuyên",
+                    narration=(
+                        "Không chỉ ban hành Luật Hồng Đức bảo vệ quyền lợi phụ nữ, ngài cho vẽ Hồng Đức Bản Đồ khẳng định trọn vẹn bờ cõi. "
+                        "Tại Văn Miếu, bia tiến sĩ được dựng lên tôn vinh hiền tài là nguyên khí quốc gia!"
+                    ),
+                    dialogues=[
+                        DialogueLine(
+                            speaker="Người dẫn chuyện",
+                            text="Kẻ nào dám đem đất của tổ tông dâng cho giặc, phải tội tru di!",
+                            dialogue_type=DialogueType.NARRATION,
+                            is_fictional=False
+                        )
+                    ],
+                    key_historical_facts=[
+                        "Bộ luật Hồng Đức bảo vệ phụ nữ",
+                        "Bản đồ Hồng Đức hoàn thành xác định bờ cõi 13 đạo thừa tuyên",
+                        "Dựng bia tiến sĩ Văn Miếu năm 1484"
+                    ],
+                    citations=get_citations_for_page(2) + get_citations_for_page(3) + get_citations_for_page(4),
+                    needs_review=False
+                ),
+                ScriptScene(
+                    scene_number=3,
+                    title="Kết luận: Di Sản Trường Tồn Non Sông",
+                    scene_type=SceneType.CONCLUSION,
+                    estimated_duration_seconds=15,
+                    historical_setting="Văn Miếu Quốc Tử Giám rực sáng ánh mặt trời",
+                    narration=(
+                        "Hơn nửa thiên niên kỷ trôi qua, bài học về ý chí tự cường dân tộc và tinh thần 'Hiền tài là nguyên khí quốc gia' "
+                        "của vua Lê Thánh Tông vẫn là ngọn hải đăng soi sáng non sông Việt Nam."
+                    ),
+                    dialogues=[
+                        DialogueLine(
+                            speaker="Vua Lê Thánh Tông",
+                            text="Hiền tài là nguyên khí của quốc gia, nguyên khí thịnh thì thế nước mạnh.",
+                            dialogue_type=DialogueType.HISTORICAL_QUOTE,
+                            is_fictional=False,
+                            citation=get_citations_for_page(3)[0] if get_citations_for_page(3) else None
+                        )
+                    ],
+                    key_historical_facts=["Lê Thánh Tông để lại di sản nhà nước pháp quyền và văn hóa rực rỡ."],
+                    citations=get_citations_for_page(3),
+                    needs_review=False
+                )
+            ]
+            tot_s = sum(s.estimated_duration_seconds for s in shorts_scenes)
+            return VideoScript(
+                title="Vua Lê Thánh Tông: Lời Thề Giữ Đất & Kỷ Nguyên Hoàng Kim (Shorts)",
+                subject=subject,
+                format=ScriptFormat.SHORTS,
+                target_duration_minutes=round(tot_s / 60.0, 1),
+                total_estimated_duration_seconds=tot_s,
+                hook="Vị vua nào của Đại Việt từng tuyên bố chém đầu bất kỳ ai dám để mất một tấc đất biên cương?",
+                background_summary="Tóm lược 55 giây về cuộc đời và di sản của Hoàng đế Lê Thánh Tông.",
+                scenes=shorts_scenes,
+                conclusion="Hiền tài là nguyên khí quốc gia — bài học tự cường bất hủ.",
+                total_scenes=len(shorts_scenes),
+                verified_claims_count=len(all_citations),
+                flagged_for_review_count=0,
+                sources_consulted=sources_consulted,
+                provider_diagnostics={"provider": "offline", "is_fallback": False}
+            )
+
+        if script_fmt == ScriptFormat.EXPLAINER:
+            explainer_scenes = [
+                ScriptScene(
+                    scene_number=1,
+                    title="Mở đầu: Vị Hoàng đế Thay đổi Vận mệnh Đại Việt",
+                    scene_type=SceneType.HOOK,
+                    estimated_duration_seconds=30,
+                    historical_setting="Năm 1460, Hoàng thành Thăng Long, đêm sau cuộc chính biến cung đình",
+                    narration=(
+                        "Mùa hè năm 1460, chàng thanh niên Lê Tư Thành 18 tuổi bước lên ngai vàng giữa lúc triều đình rung chuyển. "
+                        "Vị vua trẻ ấy — Hoàng đế Lê Thánh Tông — đã mở ra thời kỳ hoàng kim rực rỡ nhất trong một ngàn năm phong kiến Đại Việt."
+                    ),
+                    dialogues=[
+                        DialogueLine(
+                            speaker="Người dẫn chuyện",
+                            text="Hãy cùng ChronicleAI khám phá triều đại rực rỡ thời Hồng Đức.",
+                            dialogue_type=DialogueType.NARRATION,
+                            is_fictional=False
+                        )
+                    ],
+                    key_historical_facts=["Lê Tư Thành đăng cơ năm 1460."],
+                    citations=get_citations_for_page(1),
+                    needs_review=False
+                ),
+                ScriptScene(
+                    scene_number=2,
+                    title="Cuộc Đại Cải Cách: 13 Đạo Thừa Tuyên & Luật Hồng Đức",
+                    scene_type=SceneType.KEY_ACHIEVEMENT,
+                    estimated_duration_seconds=70,
+                    historical_setting="Điện Kính Thiên, Hoàng thành Thăng Long",
+                    narration=(
+                        "Lê Thánh Tông bãi bỏ chức Tể tướng, trực tiếp điều hành thông qua Lục Bộ và Lục Khoa. "
+                        "Ở địa phương, vua chia cả nước thành 13 Đạo thừa tuyên với Tam ty kiềm chế quyền lực. "
+                        "Đặc biệt, Quốc Triều Hình Luật (Luật Hồng Đức) ra đời với những điều khoản tiến bộ vượt bậc, "
+                        "bảo vệ quyền thừa kế và tài sản của phụ nữ."
+                    ),
+                    dialogues=[
+                        DialogueLine(
+                            speaker="Vua Lê Thánh Tông",
+                            text="Triều đình cần người tài chứ không cần kẻ ôm quyền làm loạn!",
+                            dialogue_type=DialogueType.FICTIONAL_DRAMATIZATION,
+                            is_fictional=True
+                        )
+                    ],
+                    key_historical_facts=["13 Đạo thừa tuyên chia sẻ quyền lực", "Luật Hồng Đức bảo vệ phụ nữ"],
+                    citations=get_citations_for_page(1) + get_citations_for_page(2),
+                    needs_review=False
+                ),
+                ScriptScene(
+                    scene_number=3,
+                    title="Đỉnh Cao Trí Tuệ: Bia Tiến Sĩ Văn Miếu & Hội Tao Đàn",
+                    scene_type=SceneType.KEY_ACHIEVEMENT,
+                    estimated_duration_seconds=80,
+                    historical_setting="Văn Miếu Quốc Tử Giám & Vườn hoa Quỳnh Lâm",
+                    narration=(
+                        "Năm 1484, vua khởi xướng dựng bia tiến sĩ tại Văn Miếu, khắc ghi chân lý bất hủ: "
+                        "'Hiền tài là nguyên khí của quốc gia'. Vua đích thân làm Tao Đàn đô nguyên súy, "
+                        "sáng tác thơ phú và cho lập Hồng Đức Bản Đồ toàn vẹn lãnh thổ."
+                    ),
+                    dialogues=[
+                        DialogueLine(
+                            speaker="Thân Nhân Trung",
+                            text="Hiền tài là nguyên khí của quốc gia, nguyên khí thịnh thì thế nước mạnh.",
+                            dialogue_type=DialogueType.HISTORICAL_QUOTE,
+                            is_fictional=False,
+                            citation=get_citations_for_page(3)[0] if get_citations_for_page(3) else None
+                        )
+                    ],
+                    key_historical_facts=["Khắc bia tiến sĩ Văn Miếu năm 1484", "Hội Tao Đàn sáng lập năm 1495"],
+                    citations=get_citations_for_page(3) + get_citations_for_page(4),
+                    needs_review=False
+                ),
+                ScriptScene(
+                    scene_number=4,
+                    title="Chủ Quyền Bất Khả Xâm Phạm & Di Sản Trường Tồn",
+                    scene_type=SceneType.CONCLUSION,
+                    estimated_duration_seconds=60,
+                    historical_setting="Biên ải Đại Việt & Thăng Long rực rỡ",
+                    narration=(
+                        "Lời thề biên cương năm 1473: 'Một thước núi, một tấc sông của ta, lẽ nào lại tự tiện vứt bỏ đi được?' "
+                        "đã trở thành kim chỉ nam giữ nước muôn đời. Triều đại Hồng Đức thịnh trị 38 năm "
+                        "là đỉnh cao văn hiến và bản lĩnh tự cường của dân tộc Việt Nam."
+                    ),
+                    dialogues=[
+                        DialogueLine(
+                            speaker="Vua Lê Thánh Tông",
+                            text="Một thước núi, một tấc sông của ta, lẽ nào lại tự tiện vứt bỏ đi được? Kẻ nào dám đem làm mồi cho giặc phải tru di!",
+                            dialogue_type=DialogueType.HISTORICAL_QUOTE,
+                            is_fictional=False,
+                            citation=get_citations_for_page(5)[0] if get_citations_for_page(5) else None
+                        )
+                    ],
+                    key_historical_facts=["Lời thề bảo vệ chủ quyền biên cương năm 1473."],
+                    citations=get_citations_for_page(5),
+                    needs_review=False
+                )
+            ]
+            tot_e = sum(s.estimated_duration_seconds for s in explainer_scenes)
+            return VideoScript(
+                title="Hoàng Đế Lê Thánh Tông: Triều Đại Hoàng Kim Hồng Đức (Explainer)",
+                subject=subject,
+                format=ScriptFormat.EXPLAINER,
+                target_duration_minutes=round(tot_e / 60.0, 1),
+                total_estimated_duration_seconds=tot_e,
+                hook="Mùa hè năm 1460, một chàng thanh niên 18 tuổi bước lên ngai vàng mở ra thời kỳ hoàng kim...",
+                background_summary="Khảo cứu súc tích 4 phút về cuộc đời, cải cách và di sản của vua Lê Thánh Tông.",
+                scenes=explainer_scenes,
+                conclusion="38 năm trị vì Hồng Đức là đỉnh cao văn hiến và bản lĩnh tự cường của dân tộc Việt Nam.",
+                total_scenes=len(explainer_scenes),
+                verified_claims_count=len(all_citations),
+                flagged_for_review_count=0,
+                sources_consulted=sources_consulted,
+                provider_diagnostics={"provider": "offline", "is_fallback": False}
+            )
+
         scenes: List[ScriptScene] = [
             ScriptScene(
                 scene_number=1,
@@ -428,6 +651,7 @@ class ChronicleOfflineRuleEngine(BaseLLMProvider):
                 citations=get_citations_for_page(1),
                 needs_review=False
             ),
+
             ScriptScene(
                 scene_number=2,
                 title="Cuộc Đại Cải Cách Hành Chính: Bãi bỏ Tể Tướng & 13 Đạo Thừa Tuyên",
@@ -636,14 +860,17 @@ class ChronicleOfflineRuleEngine(BaseLLMProvider):
 
     async def generate_storyboard(
         self,
-        script: VideoScript
+        script: VideoScript,
+        aspect_ratio: str = "16:9"
     ) -> Storyboard:
         """
         Convert script scenes into 2D minimalist animation storyboards
         with stick-figure-inspired characters, traditional Vietnamese attire (áo giao lĩnh, khăn đóng),
         authentic historical settings, camera staging, and production-ready AI image prompts.
+        Supports aspect_ratio: '16:9' (horizontal) or '9:16' (vertical shorts).
         """
         storyboard_scenes: List[StoryboardScene] = []
+        ar = aspect_ratio if aspect_ratio in ("16:9", "9:16") else "16:9"
 
         visual_settings_map = {
             1: "Kinh thành Thăng Long về đêm, ánh đuốc bập bùng trên tường thành rêu phong cổ kính",
@@ -665,6 +892,8 @@ class ChronicleOfflineRuleEngine(BaseLLMProvider):
             7: "Góc máy đại cảnh (Epic extreme wide shot) chuyển dần sang hình ảnh Văn Miếu thời hiện đại"
         }
 
+        aspect_framing = "cinematic 9:16 vertical composition, vertical mobile frame for educational animation" if ar == "9:16" else "cinematic 16:9 horizontal composition"
+
         for scene in script.scenes:
             setting = visual_settings_map.get(scene.scene_number, scene.historical_setting)
             cam = camera_map.get(scene.scene_number, "Góc trung cảnh tĩnh (Static medium shot)")
@@ -675,7 +904,7 @@ class ChronicleOfflineRuleEngine(BaseLLMProvider):
                 f"Vietnamese historical setting: {setting}. Character wearing authentic 15th-century Đại Việt "
                 f"emperor attire with yellow Áo Giao Lĩnh robe, ornate dragon embroidery accents, simple line-art face, "
                 f"clean vector outlines, muted traditional Vietnamese earth tones, watercolor wash background, "
-                f"no complex 3D shading, dynamic minimalist composition, cinematic 16:9, high resolution."
+                f"no complex 3D shading, dynamic minimalist composition, {aspect_framing}, high resolution."
             )
 
             # Character dialogue summary
@@ -690,7 +919,7 @@ class ChronicleOfflineRuleEngine(BaseLLMProvider):
                     character_dialogue=dialogue_str,
                     historical_setting=setting,
                     visual_description=(
-                        f"Phim hoạt hình 2D phong cách tối giản (minimalist vector). Nhân vật dạng que (stick-figure) "
+                        f"Phim hoạt hình 2D phong cách tối giản (minimalist vector, khung hình {ar}). Nhân vật dạng que (stick-figure) "
                         f"được cách điệu giàu biểu cảm, khoác trang phục truyền thống thế kỷ 15. {setting}."
                     ),
                     camera_direction=cam,
@@ -708,11 +937,13 @@ class ChronicleOfflineRuleEngine(BaseLLMProvider):
             subject=script.subject,
             total_scenes=len(storyboard_scenes),
             total_duration_seconds=sum(s.estimated_duration_seconds for s in storyboard_scenes),
+            aspect_ratio=ar,
             visual_theme=(
-                "Minimalist 2D Vietnamese historical animation, clean vector stick-figure style, "
+                f"Minimalist 2D Vietnamese historical animation, clean vector stick-figure style ({ar}), "
                 "authentic 15th-century Đại Việt costumes (áo giao lĩnh, khăn đóng), subtle muted watercolor backgrounds"
             ),
-            scenes=storyboard_scenes
+            scenes=storyboard_scenes,
+            provider_diagnostics={"provider": "offline", "is_fallback": False}
         )
 
 
@@ -723,33 +954,46 @@ class GeminiLLMProvider(BaseLLMProvider):
     """
     Remote LLM Provider utilizing Google Gemini API.
     Activated when GEMINI_API_KEY is supplied.
-    Seamlessly falls back to ChronicleOfflineRuleEngine if the remote API is unreachable.
+    Seamlessly falls back to ChronicleOfflineRuleEngine if remote API is unreachable or times out,
+    tagging diagnostics transparently so users know if fallback was used.
     """
     def __init__(self, api_key: str, model: str = "gemini-1.5-flash"):
         self.api_key = api_key
         self.model = model
         self.fallback = ChronicleOfflineRuleEngine()
 
-    async def _call_gemini(self, prompt: str) -> Optional[str]:
+    async def _call_gemini(self, prompt: str, json_mode: bool = False) -> Optional[str]:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent?key={self.api_key}"
+        gen_config: Dict[str, Any] = {"temperature": 0.2}
+        if json_mode:
+            gen_config["response_mime_type"] = "application/json"
         payload = {
             "contents": [{"parts": [{"text": prompt}]}],
-            "generationConfig": {"temperature": 0.2}
+            "generationConfig": gen_config
         }
-        try:
-            async with httpx.AsyncClient(timeout=25.0) as client:
-                res = await client.post(url, json=payload)
-                if res.status_code == 200:
-                    data = res.json()
-                    candidates = data.get("candidates", [])
-                    if candidates and "content" in candidates[0]:
-                        parts = candidates[0]["content"].get("parts", [])
-                        if parts and "text" in parts[0]:
-                            return parts[0]["text"]
-                else:
-                    logger.warning(f"Gemini API returned status {res.status_code}: {res.text[:200]}")
-        except Exception as e:
-            logger.warning(f"Gemini API invocation error: {e}. Falling back to offline engine.")
+        for attempt in range(2):
+            try:
+                async with httpx.AsyncClient(timeout=25.0) as client:
+                    res = await client.post(url, json=payload)
+                    if res.status_code == 200:
+                        data = res.json()
+                        candidates = data.get("candidates", [])
+                        if candidates and "content" in candidates[0]:
+                            parts = candidates[0]["content"].get("parts", [])
+                            if parts and "text" in parts[0]:
+                                return parts[0]["text"]
+                    elif res.status_code >= 500:
+                        logger.warning(f"Gemini API 5xx error (attempt {attempt+1}): {res.status_code}")
+                        if attempt == 0:
+                            await asyncio.sleep(1.0)
+                            continue
+                    else:
+                        logger.warning(f"Gemini API returned status {res.status_code}: {res.text[:200]}")
+                        break
+            except Exception as e:
+                logger.warning(f"Gemini API invocation error (attempt {attempt+1}): {e}")
+                if attempt == 0:
+                    await asyncio.sleep(1.0)
         return None
 
     async def generate_grounded_answer(
@@ -758,7 +1002,9 @@ class GeminiLLMProvider(BaseLLMProvider):
         retrieved_chunks: List[SearchResult]
     ) -> Dict[str, Any]:
         if not retrieved_chunks:
-            return await self.fallback.generate_grounded_answer(question, retrieved_chunks)
+            res = await self.fallback.generate_grounded_answer(question, retrieved_chunks)
+            res["provider_diagnostics"] = {"provider": "offline_fallback", "is_fallback": True}
+            return res
 
         context_lines = [
             f"[Source: {c.source}, Page {c.page}, Chunk {c.chunk_id}]\n{c.text}"
@@ -766,7 +1012,7 @@ class GeminiLLMProvider(BaseLLMProvider):
         ]
         context_str = "\n\n".join(context_lines)
         prompt = (
-            f"You are a strict historical research assistant. Answer the question using ONLY the provided historical excerpts.\n"
+            f"You are a strict historical research assistant for ChronicleAI. Answer the question using ONLY the provided historical excerpts.\n"
             f"Do not speculate or extrapolate beyond the text. Cite the source, page, and chunk.\n\n"
             f"Historical Excerpts:\n{context_str}\n\n"
             f"Question: {question}\n\n"
@@ -777,45 +1023,238 @@ class GeminiLLMProvider(BaseLLMProvider):
             return {
                 "answer": answer_text.strip(),
                 "citations": [c.citation for c in retrieved_chunks[:3]],
-                "grounded": True
+                "grounded": True,
+                "provider_diagnostics": {"provider": f"gemini/{self.model}", "is_fallback": False}
             }
-        return await self.fallback.generate_grounded_answer(question, retrieved_chunks)
+        res = await self.fallback.generate_grounded_answer(question, retrieved_chunks)
+        res["provider_diagnostics"] = {"provider": "offline_fallback", "is_fallback": True}
+        return res
 
     async def verify_claim(
         self,
         claim: str,
         retrieved_chunks: List[SearchResult]
     ) -> SingleClaimVerification:
-        # Fall back directly or enhance with Gemini when needed
-        return await self.fallback.verify_claim(claim, retrieved_chunks)
+        if not retrieved_chunks:
+            res = await self.fallback.verify_claim(claim, retrieved_chunks)
+            res.provider_diagnostics = {"provider": "offline_fallback", "is_fallback": True}
+            return res
+
+        context_str = "\n\n".join([f"[{c.source}, Page {c.page}, Chunk {c.chunk_id}]\n{c.text}" for c in retrieved_chunks[:4]])
+        prompt = f"""You are a rigorous historical fact-checker for ChronicleAI.
+Evaluate whether the following claim is SUPPORTED, CONTRADICTED, or INSUFFICIENT_EVIDENCE based strictly on the provided historical sources.
+Respond in valid JSON only with keys:
+"status": "SUPPORTED" | "CONTRADICTED" | "INSUFFICIENT_EVIDENCE",
+"confidence": float between 0.0 and 1.0,
+"explanation": detailed Vietnamese rationale citing sources and pages,
+"has_conflict": boolean,
+"conflict_description": string or null
+
+Sources:
+{context_str}
+
+Claim to verify:
+"{claim}"
+"""
+        raw = await self._call_gemini(prompt, json_mode=True)
+        if raw:
+            try:
+                clean_json = re.sub(r"^```json\s*", "", raw.strip(), flags=re.MULTILINE)
+                clean_json = re.sub(r"\s*```$", "", clean_json, flags=re.MULTILINE)
+                parsed = json.loads(clean_json)
+                st = parsed.get("status", "INSUFFICIENT_EVIDENCE").upper()
+                if st not in ("SUPPORTED", "CONTRADICTED", "INSUFFICIENT_EVIDENCE"):
+                    st = "INSUFFICIENT_EVIDENCE"
+                citations = [retrieved_chunks[0].citation] if (st == "SUPPORTED" and retrieved_chunks) else []
+                return SingleClaimVerification(
+                    claim=claim,
+                    status=VerificationLabel(st),
+                    confidence=float(parsed.get("confidence", 0.9)),
+                    explanation=parsed.get("explanation", "Xác minh qua Gemini AI."),
+                    citations=citations,
+                    disagreement=HistoricalDisagreement(
+                        has_conflict=bool(parsed.get("has_conflict", False)),
+                        description=parsed.get("conflict_description")
+                    ),
+                    provider_diagnostics={"provider": f"gemini/{self.model}", "is_fallback": False}
+                )
+            except Exception as e:
+                logger.warning(f"Failed parsing Gemini verify_claim JSON: {e}")
+
+        res = await self.fallback.verify_claim(claim, retrieved_chunks)
+        res.provider_diagnostics = {"provider": "offline_fallback", "is_fallback": True}
+        return res
 
     async def generate_script(
         self,
         subject: str,
-        target_minutes: int,
-        chunks: List[SearchResult]
+        target_minutes: float,
+        chunks: List[SearchResult],
+        format: Optional[str] = None
     ) -> VideoScript:
-        return await self.fallback.generate_script(subject, target_minutes, chunks)
+        context_str = "\n\n".join([f"[{c.source}, Page {c.page}, Chunk {c.chunk_id}]\n{c.text}" for c in chunks[:5]])
+        prompt = f"""You are a master historical documentary scriptwriter for ChronicleAI.
+Generate a structured video script for subject: '{subject}', target duration: {target_minutes} minutes, format: {format or 'DOCUMENTARY'}.
+Respond in valid JSON only with keys:
+"title": string,
+"subject": string,
+"hook": string,
+"background_summary": string,
+"conclusion": string,
+"scenes": [
+  {{
+    "scene_number": integer,
+    "title": string,
+    "scene_type": "HOOK" | "BACKGROUND" | "NARRATIVE" | "KEY_ACHIEVEMENT" | "HISTORICAL_CONFLICT" | "CONCLUSION",
+    "estimated_duration_seconds": integer,
+    "historical_setting": string,
+    "narration": string,
+    "dialogues": [
+      {{"speaker": string, "text": string, "dialogue_type": "HISTORICAL_QUOTE" | "FICTIONAL_DRAMATIZATION" | "NARRATION", "is_fictional": boolean}}
+    ],
+    "key_historical_facts": [string]
+  }}
+]
+
+Historical Sources:
+{context_str}
+"""
+        raw = await self._call_gemini(prompt, json_mode=True)
+        if raw:
+            try:
+                clean_json = re.sub(r"^```json\s*", "", raw.strip(), flags=re.MULTILINE)
+                clean_json = re.sub(r"\s*```$", "", clean_json, flags=re.MULTILINE)
+                parsed = json.loads(clean_json)
+                built_scenes: List[ScriptScene] = []
+                for s in parsed.get("scenes", []):
+                    d_lines = [
+                        DialogueLine(
+                            speaker=d.get("speaker", "Người dẫn chuyện"),
+                            text=d.get("text", ""),
+                            dialogue_type=DialogueType(d.get("dialogue_type", "NARRATION")),
+                            is_fictional=bool(d.get("is_fictional", False))
+                        ) for d in s.get("dialogues", [])
+                    ]
+                    built_scenes.append(ScriptScene(
+                        scene_number=int(s.get("scene_number", len(built_scenes) + 1)),
+                        title=s.get("title", f"Cảnh {len(built_scenes) + 1}"),
+                        scene_type=SceneType(s.get("scene_type", "NARRATIVE")),
+                        estimated_duration_seconds=int(s.get("estimated_duration_seconds", 60)),
+                        historical_setting=s.get("historical_setting", "Đại Việt thế kỷ 15"),
+                        narration=s.get("narration", ""),
+                        dialogues=d_lines,
+                        key_historical_facts=s.get("key_historical_facts", []),
+                        citations=[c.citation for c in chunks[:2]] if chunks else [],
+                        needs_review=False
+                    ))
+                fmt_enum = ScriptFormat(format.upper()) if format and format.upper() in ScriptFormat.__members__ else ScriptFormat.DOCUMENTARY
+                tot_sec = sum(s.estimated_duration_seconds for s in built_scenes)
+                return VideoScript(
+                    title=parsed.get("title", f"Khảo Cứu Lịch Sử: {subject}"),
+                    subject=subject,
+                    format=fmt_enum,
+                    target_duration_minutes=round(tot_sec / 60.0, 1),
+                    total_estimated_duration_seconds=tot_sec,
+                    hook=parsed.get("hook", f"Khám phá cuộc đời và sự nghiệp của {subject}."),
+                    background_summary=parsed.get("background_summary", "Bối cảnh lịch sử thời Lê sơ thế kỷ 15."),
+                    conclusion=parsed.get("conclusion", "Di sản trường tồn cùng non sông Đại Việt."),
+                    scenes=built_scenes,
+                    total_scenes=len(built_scenes),
+                    verified_claims_count=len(built_scenes),
+                    sources_consulted=list(set([c.source for c in chunks])),
+                    provider_diagnostics={"provider": f"gemini/{self.model}", "is_fallback": False}
+                )
+            except Exception as e:
+                logger.warning(f"Failed parsing Gemini script JSON: {e}")
+
+        res = await self.fallback.generate_script(subject, target_minutes, chunks, format)
+        res.provider_diagnostics = {"provider": "offline_fallback", "is_fallback": True}
+        return res
 
     async def generate_storyboard(
         self,
-        script: VideoScript
+        script: VideoScript,
+        aspect_ratio: str = "16:9"
     ) -> Storyboard:
-        return await self.fallback.generate_storyboard(script)
+        prompt = f"""You are an animation art director for ChronicleAI.
+Convert the following script scenes into visual storyboard scenes for a 2D minimalist vector animation (aspect ratio: {aspect_ratio}).
+Respond in valid JSON only with keys:
+"visual_theme": string,
+"scenes": [
+  {{
+    "scene_number": integer,
+    "title": string,
+    "estimated_duration_seconds": integer,
+    "narration": string,
+    "character_dialogue": string,
+    "historical_setting": string,
+    "visual_description": string,
+    "camera_direction": string,
+    "character_poses": [string],
+    "ai_image_prompt": string
+  }}
+]
+
+Script Title: {script.title}
+Scenes to storyboard:
+"""
+        for sc in script.scenes:
+            prompt += f"\nScene {sc.scene_number} ({sc.title}): {sc.narration[:150]}"
+
+        raw = await self._call_gemini(prompt, json_mode=True)
+        if raw:
+            try:
+                clean_json = re.sub(r"^```json\s*", "", raw.strip(), flags=re.MULTILINE)
+                clean_json = re.sub(r"\s*```$", "", clean_json, flags=re.MULTILINE)
+                parsed = json.loads(clean_json)
+                sb_scenes: List[StoryboardScene] = []
+                for s in parsed.get("scenes", []):
+                    matched_script_scene = next((sc for sc in script.scenes if sc.scene_number == s.get("scene_number")), None)
+                    cits = matched_script_scene.citations if matched_script_scene else []
+                    sb_scenes.append(StoryboardScene(
+                        scene_number=int(s.get("scene_number", len(sb_scenes) + 1)),
+                        title=s.get("title", f"Cảnh {len(sb_scenes) + 1}"),
+                        estimated_duration_seconds=int(s.get("estimated_duration_seconds", 60)),
+                        narration=s.get("narration", ""),
+                        character_dialogue=s.get("character_dialogue", ""),
+                        historical_setting=s.get("historical_setting", "Đại Việt"),
+                        visual_description=s.get("visual_description", ""),
+                        camera_direction=s.get("camera_direction", "Wide shot"),
+                        character_poses=s.get("character_poses", []),
+                        ai_image_prompt=s.get("ai_image_prompt", ""),
+                        evidence_references=cits
+                    ))
+                return Storyboard(
+                    script_title=script.title,
+                    subject=script.subject,
+                    total_scenes=len(sb_scenes),
+                    total_duration_seconds=sum(s.estimated_duration_seconds for s in sb_scenes),
+                    aspect_ratio=aspect_ratio,
+                    visual_theme=parsed.get("visual_theme", f"Minimalist 2D Vietnamese historical vector animation ({aspect_ratio})"),
+                    scenes=sb_scenes,
+                    provider_diagnostics={"provider": f"gemini/{self.model}", "is_fallback": False}
+                )
+            except Exception as e:
+                logger.warning(f"Failed parsing Gemini storyboard JSON: {e}")
+
+        res = await self.fallback.generate_storyboard(script, aspect_ratio=aspect_ratio)
+        res.provider_diagnostics = {"provider": "offline_fallback", "is_fallback": True}
+        return res
 
 
 class OpenAILLMProvider(BaseLLMProvider):
     """
     Remote LLM Provider utilizing OpenAI Chat Completions API (e.g. GPT-4o, GPT-4o-mini).
     Activated when OPENAI_API_KEY is supplied.
-    Seamlessly falls back to ChronicleOfflineRuleEngine if the remote API is unreachable or rate limited.
+    Seamlessly falls back to ChronicleOfflineRuleEngine if the remote API is unreachable or rate limited,
+    recording transparent diagnostic flags on every output.
     """
     def __init__(self, api_key: str, model: str = "gpt-4o"):
         self.api_key = api_key
         self.model = model
         self.fallback = ChronicleOfflineRuleEngine()
 
-    async def _call_openai(self, system_prompt: str, user_prompt: str) -> Optional[str]:
+    async def _call_openai(self, system_prompt: str, user_prompt: str, json_mode: bool = False) -> Optional[str]:
         url = "https://api.openai.com/v1/chat/completions"
         headers = {
             "Authorization": f"Bearer {self.api_key}",
@@ -829,18 +1268,30 @@ class OpenAILLMProvider(BaseLLMProvider):
             ],
             "temperature": 0.2
         }
-        try:
-            async with httpx.AsyncClient(timeout=25.0) as client:
-                res = await client.post(url, headers=headers, json=payload)
-                if res.status_code == 200:
-                    data = res.json()
-                    choices = data.get("choices", [])
-                    if choices and "message" in choices[0]:
-                        return choices[0]["message"].get("content")
-                else:
-                    logger.warning(f"OpenAI API returned status {res.status_code}: {res.text[:200]}")
-        except Exception as e:
-            logger.warning(f"OpenAI API invocation error: {e}. Falling back to offline engine.")
+        if json_mode:
+            payload["response_format"] = {"type": "json_object"}
+
+        for attempt in range(2):
+            try:
+                async with httpx.AsyncClient(timeout=25.0) as client:
+                    res = await client.post(url, headers=headers, json=payload)
+                    if res.status_code == 200:
+                        data = res.json()
+                        choices = data.get("choices", [])
+                        if choices and "message" in choices[0]:
+                            return choices[0]["message"].get("content")
+                    elif res.status_code >= 500:
+                        logger.warning(f"OpenAI API 5xx error (attempt {attempt+1}): {res.status_code}")
+                        if attempt == 0:
+                            await asyncio.sleep(1.0)
+                            continue
+                    else:
+                        logger.warning(f"OpenAI API returned status {res.status_code}: {res.text[:200]}")
+                        break
+            except Exception as e:
+                logger.warning(f"OpenAI API invocation error (attempt {attempt+1}): {e}")
+                if attempt == 0:
+                    await asyncio.sleep(1.0)
         return None
 
     async def generate_grounded_answer(
@@ -849,7 +1300,9 @@ class OpenAILLMProvider(BaseLLMProvider):
         retrieved_chunks: List[SearchResult]
     ) -> Dict[str, Any]:
         if not retrieved_chunks:
-            return await self.fallback.generate_grounded_answer(question, retrieved_chunks)
+            res = await self.fallback.generate_grounded_answer(question, retrieved_chunks)
+            res["provider_diagnostics"] = {"provider": "offline_fallback", "is_fallback": True}
+            return res
 
         context_lines = [
             f"[Source: {c.source}, Page {c.page}, Chunk {c.chunk_id}]\n{c.text}"
@@ -866,30 +1319,180 @@ class OpenAILLMProvider(BaseLLMProvider):
             return {
                 "answer": answer_text.strip(),
                 "citations": [c.citation for c in retrieved_chunks[:3]],
-                "grounded": True
+                "grounded": True,
+                "provider_diagnostics": {"provider": f"openai/{self.model}", "is_fallback": False}
             }
-        return await self.fallback.generate_grounded_answer(question, retrieved_chunks)
+        res = await self.fallback.generate_grounded_answer(question, retrieved_chunks)
+        res["provider_diagnostics"] = {"provider": "offline_fallback", "is_fallback": True}
+        return res
 
     async def verify_claim(
         self,
         claim: str,
         retrieved_chunks: List[SearchResult]
     ) -> SingleClaimVerification:
-        return await self.fallback.verify_claim(claim, retrieved_chunks)
+        if not retrieved_chunks:
+            res = await self.fallback.verify_claim(claim, retrieved_chunks)
+            res.provider_diagnostics = {"provider": "offline_fallback", "is_fallback": True}
+            return res
+
+        context_str = "\n\n".join([f"[{c.source}, Page {c.page}, Chunk {c.chunk_id}]\n{c.text}" for c in retrieved_chunks[:4]])
+        system_prompt = "You are a rigorous historical fact-checker for ChronicleAI. Always respond in valid JSON with keys: status, confidence, explanation, has_conflict, conflict_description."
+        user_prompt = f"""Evaluate whether the following claim is SUPPORTED, CONTRADICTED, or INSUFFICIENT_EVIDENCE based strictly on the provided historical sources.
+Status must be one of: "SUPPORTED", "CONTRADICTED", "INSUFFICIENT_EVIDENCE".
+Explanation must be in Vietnamese citing exact sources and pages.
+
+Sources:
+{context_str}
+
+Claim to verify:
+"{claim}"
+"""
+        raw = await self._call_openai(system_prompt, user_prompt, json_mode=True)
+        if raw:
+            try:
+                parsed = json.loads(raw.strip())
+                st = parsed.get("status", "INSUFFICIENT_EVIDENCE").upper()
+                if st not in ("SUPPORTED", "CONTRADICTED", "INSUFFICIENT_EVIDENCE"):
+                    st = "INSUFFICIENT_EVIDENCE"
+                citations = [retrieved_chunks[0].citation] if (st == "SUPPORTED" and retrieved_chunks) else []
+                return SingleClaimVerification(
+                    claim=claim,
+                    status=VerificationLabel(st),
+                    confidence=float(parsed.get("confidence", 0.9)),
+                    explanation=parsed.get("explanation", "Xác minh bởi OpenAI GPT."),
+                    citations=citations,
+                    disagreement=HistoricalDisagreement(
+                        has_conflict=bool(parsed.get("has_conflict", False)),
+                        description=parsed.get("conflict_description")
+                    ),
+                    provider_diagnostics={"provider": f"openai/{self.model}", "is_fallback": False}
+                )
+            except Exception as e:
+                logger.warning(f"Failed parsing OpenAI verify_claim JSON: {e}")
+
+        res = await self.fallback.verify_claim(claim, retrieved_chunks)
+        res.provider_diagnostics = {"provider": "offline_fallback", "is_fallback": True}
+        return res
 
     async def generate_script(
         self,
         subject: str,
-        target_minutes: int,
-        chunks: List[SearchResult]
+        target_minutes: float,
+        chunks: List[SearchResult],
+        format: Optional[str] = None
     ) -> VideoScript:
-        return await self.fallback.generate_script(subject, target_minutes, chunks)
+        context_str = "\n\n".join([f"[{c.source}, Page {c.page}, Chunk {c.chunk_id}]\n{c.text}" for c in chunks[:5]])
+        system_prompt = "You are an expert historical video scriptwriter for ChronicleAI. Always respond in valid JSON matching VideoScript schema."
+        user_prompt = f"""Generate a structured video script for subject: '{subject}', duration: {target_minutes} minutes, format: {format or 'DOCUMENTARY'}.
+Include keys: "title", "subject", "hook", "background_summary", "conclusion", "scenes".
+Each scene has: "scene_number", "title", "scene_type", "estimated_duration_seconds", "historical_setting", "narration", "dialogues" ([{{"speaker", "text", "dialogue_type", "is_fictional"}}]), "key_historical_facts".
+
+Historical Sources:
+{context_str}
+"""
+        raw = await self._call_openai(system_prompt, user_prompt, json_mode=True)
+        if raw:
+            try:
+                parsed = json.loads(raw.strip())
+                built_scenes: List[ScriptScene] = []
+                for s in parsed.get("scenes", []):
+                    d_lines = [
+                        DialogueLine(
+                            speaker=d.get("speaker", "Người dẫn chuyện"),
+                            text=d.get("text", ""),
+                            dialogue_type=DialogueType(d.get("dialogue_type", "NARRATION")),
+                            is_fictional=bool(d.get("is_fictional", False))
+                        ) for d in s.get("dialogues", [])
+                    ]
+                    built_scenes.append(ScriptScene(
+                        scene_number=int(s.get("scene_number", len(built_scenes) + 1)),
+                        title=s.get("title", f"Cảnh {len(built_scenes) + 1}"),
+                        scene_type=SceneType(s.get("scene_type", "NARRATIVE")),
+                        estimated_duration_seconds=int(s.get("estimated_duration_seconds", 60)),
+                        historical_setting=s.get("historical_setting", "Đại Việt thế kỷ 15"),
+                        narration=s.get("narration", ""),
+                        dialogues=d_lines,
+                        key_historical_facts=s.get("key_historical_facts", []),
+                        citations=[c.citation for c in chunks[:2]] if chunks else [],
+                        needs_review=False
+                    ))
+                fmt_enum = ScriptFormat(format.upper()) if format and format.upper() in ScriptFormat.__members__ else ScriptFormat.DOCUMENTARY
+                tot_sec = sum(s.estimated_duration_seconds for s in built_scenes)
+                return VideoScript(
+                    title=parsed.get("title", f"Khảo Cứu Lịch Sử: {subject}"),
+                    subject=subject,
+                    format=fmt_enum,
+                    target_duration_minutes=round(tot_sec / 60.0, 1),
+                    total_estimated_duration_seconds=tot_sec,
+                    hook=parsed.get("hook", f"Khám phá cuộc đời và sự nghiệp của {subject}."),
+                    background_summary=parsed.get("background_summary", "Bối cảnh lịch sử thời Lê sơ thế kỷ 15."),
+                    conclusion=parsed.get("conclusion", "Di sản trường tồn cùng non sông Đại Việt."),
+                    scenes=built_scenes,
+                    total_scenes=len(built_scenes),
+                    verified_claims_count=len(built_scenes),
+                    sources_consulted=list(set([c.source for c in chunks])),
+                    provider_diagnostics={"provider": f"openai/{self.model}", "is_fallback": False}
+                )
+            except Exception as e:
+                logger.warning(f"Failed parsing OpenAI script JSON: {e}")
+
+        res = await self.fallback.generate_script(subject, target_minutes, chunks, format)
+        res.provider_diagnostics = {"provider": "offline_fallback", "is_fallback": True}
+        return res
 
     async def generate_storyboard(
         self,
-        script: VideoScript
+        script: VideoScript,
+        aspect_ratio: str = "16:9"
     ) -> Storyboard:
-        return await self.fallback.generate_storyboard(script)
+        system_prompt = "You are an animation art director for ChronicleAI. Always respond in valid JSON matching Storyboard schema."
+        user_prompt = f"""Convert the following script into visual storyboard scenes for a 2D minimalist vector animation (aspect ratio: {aspect_ratio}).
+Return JSON with keys: "visual_theme", "scenes" (array of scene_number, title, estimated_duration_seconds, narration, character_dialogue, historical_setting, visual_description, camera_direction, character_poses, ai_image_prompt).
+
+Script Title: {script.title}
+Scenes:
+"""
+        for sc in script.scenes:
+            user_prompt += f"\nScene {sc.scene_number} ({sc.title}): {sc.narration[:150]}"
+
+        raw = await self._call_openai(system_prompt, user_prompt, json_mode=True)
+        if raw:
+            try:
+                parsed = json.loads(raw.strip())
+                sb_scenes: List[StoryboardScene] = []
+                for s in parsed.get("scenes", []):
+                    matched_script_scene = next((sc for sc in script.scenes if sc.scene_number == s.get("scene_number")), None)
+                    cits = matched_script_scene.citations if matched_script_scene else []
+                    sb_scenes.append(StoryboardScene(
+                        scene_number=int(s.get("scene_number", len(sb_scenes) + 1)),
+                        title=s.get("title", f"Cảnh {len(sb_scenes) + 1}"),
+                        estimated_duration_seconds=int(s.get("estimated_duration_seconds", 60)),
+                        narration=s.get("narration", ""),
+                        character_dialogue=s.get("character_dialogue", ""),
+                        historical_setting=s.get("historical_setting", "Đại Việt"),
+                        visual_description=s.get("visual_description", ""),
+                        camera_direction=s.get("camera_direction", "Wide shot"),
+                        character_poses=s.get("character_poses", []),
+                        ai_image_prompt=s.get("ai_image_prompt", ""),
+                        evidence_references=cits
+                    ))
+                return Storyboard(
+                    script_title=script.title,
+                    subject=script.subject,
+                    total_scenes=len(sb_scenes),
+                    total_duration_seconds=sum(s.estimated_duration_seconds for s in sb_scenes),
+                    aspect_ratio=aspect_ratio,
+                    visual_theme=parsed.get("visual_theme", f"Minimalist 2D Vietnamese historical vector animation ({aspect_ratio})"),
+                    scenes=sb_scenes,
+                    provider_diagnostics={"provider": f"openai/{self.model}", "is_fallback": False}
+                )
+            except Exception as e:
+                logger.warning(f"Failed parsing OpenAI storyboard JSON: {e}")
+
+        res = await self.fallback.generate_storyboard(script, aspect_ratio=aspect_ratio)
+        res.provider_diagnostics = {"provider": "offline_fallback", "is_fallback": True}
+        return res
 
 
 def get_llm_provider() -> BaseLLMProvider:
@@ -912,3 +1515,4 @@ def get_llm_provider() -> BaseLLMProvider:
 
     logger.info("Initializing ChronicleOfflineRuleEngine (Deterministic Heuristic Baseline)")
     return ChronicleOfflineRuleEngine()
+

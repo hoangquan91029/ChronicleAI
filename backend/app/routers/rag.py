@@ -1,3 +1,4 @@
+from typing import Dict, Any
 from fastapi import APIRouter
 from app.models.rag import (
     SearchQuery,
@@ -34,6 +35,32 @@ async def search_evidence(req: SearchQuery):
     )
 
 
+@router.post("/query", response_model=GroundedAnswerResponse)
+async def query_rag(req: SearchQuery):
+    """
+    Unified RAG query endpoint: retrieves candidate chunks, computes relevance,
+    and returns a citation-backed grounded answer and the retrieved chunks.
+    """
+    results = global_vector_store.search(
+        query=req.query,
+        top_k=req.top_k,
+        document_id=req.document_id,
+        source_id=req.source_id,
+        min_page=req.min_page,
+        max_page=req.max_page,
+        min_score=0.04
+    )
+
+    qa_res = await llm.generate_grounded_answer(req.query, results)
+    return GroundedAnswerResponse(
+        question=req.query,
+        answer=qa_res["answer"],
+        grounded=qa_res["grounded"],
+        citations=qa_res["citations"],
+        retrieved_chunks=results
+    )
+
+
 @router.post("/answer", response_model=GroundedAnswerResponse)
 async def grounded_qa(req: GroundedAnswerRequest):
     """
@@ -55,3 +82,9 @@ async def grounded_qa(req: GroundedAnswerRequest):
         citations=qa_res["citations"],
         retrieved_chunks=retrieved
     )
+
+
+@router.get("/stats")
+async def rag_stats() -> Dict[str, Any]:
+    """Retrieve operational statistics of the persistent vector store index."""
+    return global_vector_store.get_stats()

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from app.models.rag import Citation
 
 
@@ -22,14 +22,26 @@ class Storyboard(BaseModel):
     subject: str
     total_scenes: int
     total_duration_seconds: int
+    aspect_ratio: str = Field(default="16:9", description="Video aspect ratio: '16:9' (horizontal) or '9:16' (vertical shorts)")
     visual_theme: str = Field(
         default="Minimalist 2D Vietnamese historical animation, clean vector stick-figure style, authentic 15th-century Đại Việt costumes (áo giao lĩnh, khăn đóng), subtle muted watercolor backgrounds",
         description="Overarching visual art direction"
     )
     scenes: List[StoryboardScene] = Field(default_factory=list)
+    provider_diagnostics: Optional[Dict[str, Any]] = None
 
 
 class StoryboardGenerationRequest(BaseModel):
     script_id: Optional[str] = None
     subject: Optional[str] = "Emperor Lê Thánh Tông (1460–1497)"
+    aspect_ratio: Optional[str] = "16:9"
     visual_style_preference: Optional[str] = "minimalist_2d_stick_figure"
+
+
+class StoryboardSceneUpdateRequest(BaseModel):
+    title: Optional[str] = None
+    visual_description: Optional[str] = None
+    camera_direction: Optional[str] = None
+    character_poses: Optional[List[str]] = None
+    ai_image_prompt: Optional[str] = None
+    historical_setting: Optional[str] = None

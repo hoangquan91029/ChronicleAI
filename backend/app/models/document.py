@@ -37,3 +37,12 @@ class DocumentIngestResponse(BaseModel):
     status: str = Field(..., description="'success', 'scanned_ocr_required', 'empty_document', 'error'")
     metadata: DocumentMetadata
     chunks: List[ChunkMetadata] = Field(default_factory=list)
+
+
+class RegisterURLRequest(BaseModel):
+    url: str = Field(..., description="Archival URL or digital repository link")
+    title: str = Field(..., description="Document or folio title")
+    text: Optional[str] = Field(None, description="Extracted transcript or archival text content")
+    source_id: Optional[str] = Field(None, description="Archival collection identifier")
+    folio_ref: Optional[str] = Field(None, description="Folio reference (e.g. XII_1a_1b)")
+

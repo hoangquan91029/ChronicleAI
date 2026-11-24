@@ -73,3 +73,33 @@ async def test_script_scene_traceability(scriptwriter):
     scene_4 = next(s for s in script.scenes if s.scene_number == 4)  # Văn Miếu stelae
     assert len(scene_4.citations) > 0
     assert scene_4.citations[0].page == 3
+
+
+@pytest.mark.asyncio
+async def test_generate_shorts_script(scriptwriter):
+    from app.models.script import ScriptFormat
+    req = ScriptGenerationRequest(
+        subject="Lê Thánh Tông",
+        format=ScriptFormat.SHORTS
+    )
+    script = await scriptwriter.generate_script(req)
+
+    assert script.format == ScriptFormat.SHORTS
+    assert script.total_scenes == 3
+    assert 40 <= script.total_estimated_duration_seconds <= 70
+    assert len(script.hook) > 10
+
+
+@pytest.mark.asyncio
+async def test_generate_explainer_script(scriptwriter):
+    from app.models.script import ScriptFormat
+    req = ScriptGenerationRequest(
+        subject="Lê Thánh Tông",
+        format=ScriptFormat.EXPLAINER
+    )
+    script = await scriptwriter.generate_script(req)
+
+    assert script.format == ScriptFormat.EXPLAINER
+    assert script.total_scenes == 4
+    assert 180 <= script.total_estimated_duration_seconds <= 300
+

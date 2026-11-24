@@ -10,7 +10,9 @@ import {
   Crown,
   BookOpen,
   Sparkles,
-  GitBranch
+  GitBranch,
+  Video,
+  Award
 } from "lucide-react";
 
 import DocumentIngestion from "../components/DocumentIngestion";
@@ -18,8 +20,10 @@ import EvidenceExplorer from "../components/EvidenceExplorer";
 import ClaimVerifier from "../components/ClaimVerifier";
 import ScriptStudio from "../components/ScriptStudio";
 import StoryboardViewer from "../components/StoryboardViewer";
+import VideoStudio from "../components/VideoStudio";
+import ArchivalExplorer from "../components/ArchivalExplorer";
 
-type TabType = "ingest" | "rag" | "verify" | "script" | "storyboard";
+type TabType = "ingest" | "rag" | "verify" | "script" | "storyboard" | "video" | "archival";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>("ingest");
@@ -38,11 +42,11 @@ export default function Home() {
               <div className="flex items-center gap-2">
                 <span className="font-bold text-lg text-slate-900 tracking-tight">ChronicleAI</span>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 tracking-wide uppercase">
-                  v1.0 MVP
+                  v1.0 Production MVP
                 </span>
               </div>
               <p className="text-xs text-slate-500">
-                Nền tảng Nghiên cứu Lịch sử & Sản xuất Video Giáo dục AI
+                Nền tảng Nghiên cứu Lịch sử & Sản xuất Video Giáo dục AI Đa Phương Thức
               </p>
             </div>
           </div>
@@ -50,7 +54,7 @@ export default function Home() {
           <div className="flex items-center gap-3">
             <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-amber-50 rounded-lg border border-amber-200/80 text-xs text-amber-900">
               <BookOpen className="w-3.5 h-3.5 text-amber-600" />
-              <span>Chuyên đề 1: <strong>Lê Thánh Tông (1460–1497)</strong></span>
+              <span>Chuyên đề: <strong>Lê Thánh Tông (1460–1497)</strong></span>
             </div>
 
             <a
@@ -76,7 +80,7 @@ export default function Home() {
             }`}
           >
             <FileText className="w-4 h-4" />
-            1. Xử Lý PDF & Phân Đoạn (Milestone 1)
+            1. Tư Liệu PDF & Lưu Trữ
           </button>
 
           <button
@@ -88,7 +92,7 @@ export default function Home() {
             }`}
           >
             <Search className="w-4 h-4" />
-            2. Tra Cứu Chứng Cứ RAG (Milestone 2)
+            2. Tra Cứu Chứng Cứ RAG
           </button>
 
           <button
@@ -100,7 +104,7 @@ export default function Home() {
             }`}
           >
             <ShieldCheck className="w-4 h-4" />
-            3. Thẩm Định Tuyên Bố Lịch Sử
+            3. Thẩm Định Tuyên Bố
           </button>
 
           <button
@@ -112,7 +116,7 @@ export default function Home() {
             }`}
           >
             <Film className="w-4 h-4" />
-            4. Xưởng Biên Kịch (Milestone 3)
+            4. Xưởng Biên Kịch
           </button>
 
           <button
@@ -124,7 +128,31 @@ export default function Home() {
             }`}
           >
             <Layout className="w-4 h-4" />
-            5. Phân Cảnh Hoạt Họa 2D (Milestone 4)
+            5. Phân Cảnh Storyboard 2D
+          </button>
+
+          <button
+            onClick={() => setActiveTab("video")}
+            className={`flex items-center gap-2 py-3 px-3.5 border-b-2 text-xs font-semibold whitespace-nowrap transition ${
+              activeTab === "video"
+                ? "border-amber-600 text-amber-700"
+                : "border-transparent text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            <Video className="w-4 h-4 text-rose-600" />
+            6. Xưởng Xuất Bản Video (MP4)
+          </button>
+
+          <button
+            onClick={() => setActiveTab("archival")}
+            className={`flex items-center gap-2 py-3 px-3.5 border-b-2 text-xs font-semibold whitespace-nowrap transition ${
+              activeTab === "archival"
+                ? "border-amber-600 text-amber-700"
+                : "border-transparent text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            <Award className="w-4 h-4 text-amber-600" />
+            7. Khảo Chứng & Thư Tịch Gốc
           </button>
         </div>
       </header>
@@ -136,13 +164,13 @@ export default function Home() {
           <div className="max-w-3xl space-y-3">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-200 border border-amber-400/30">
               <Sparkles className="w-3.5 h-3.5" />
-              Đại Việt Sử Ký Toàn Thư & Quốc Triều Hình Luật
+              Đại Việt Sử Ký Toàn Thư (Bản Kỷ Thực Lục 1697) & Quốc Triều Hình Luật
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
               Khảo Cứu & Chuyển Hóa Sử Liệu Hoàng Đế Lê Thánh Tông
             </h1>
             <p className="text-amber-100/90 text-sm leading-relaxed">
-              Quy trình khép kín: <strong>Tải lên PDF → Trích xuất & Bảo toàn số trang → Nhúng đa ngữ → Truy xuất RAG → Thẩm định tuyên bố (Supported / Contradicted / Insufficient Evidence) → Kịch bản 15–20 phút → Storyboard hoạt họa 2D tối giản</strong>.
+              Quy trình khép kín: <strong>Nạp văn khố → Trích xuất & Bảo toàn số trang → Nhúng đa ngữ → Truy xuất RAG → Thẩm định tuyên bố → Kịch bản đa thời lượng → Storyboard 2D → Xuất bản Video MP4 phát sóng</strong>.
             </p>
           </div>
         </div>
@@ -156,7 +184,11 @@ export default function Home() {
         {activeTab === "rag" && <EvidenceExplorer />}
         {activeTab === "verify" && <ClaimVerifier />}
         {activeTab === "script" && <ScriptStudio />}
-        {activeTab === "storyboard" && <StoryboardViewer />}
+        {activeTab === "storyboard" && (
+          <StoryboardViewer onNavigateToVideo={() => setActiveTab("video")} />
+        )}
+        {activeTab === "video" && <VideoStudio />}
+        {activeTab === "archival" && <ArchivalExplorer />}
       </main>
 
       {/* Footer */}

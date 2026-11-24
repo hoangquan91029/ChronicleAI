@@ -1,6 +1,6 @@
 from enum import Enum
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from app.models.rag import Citation
 
 
@@ -23,6 +23,8 @@ class SingleClaimVerification(BaseModel):
     explanation: str = Field(..., description="Detailed historical rationale based strictly on source text")
     citations: List[Citation] = Field(default_factory=list, description="Citations supporting or refuting the claim")
     disagreement: Optional[HistoricalDisagreement] = None
+    provider_diagnostics: Optional[Dict[str, Any]] = None
+
 
 
 class ClaimVerificationRequest(BaseModel):

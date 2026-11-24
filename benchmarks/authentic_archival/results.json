@@ -1,0 +1,444 @@
+{
+  "benchmark_type": "authentic_archival",
+  "primary_source": "Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục (Quyển XII & XIII)",
+  "edition": "Nội các quan bản (1697, triều Chính Hòa)",
+  "digital_repository": "https://www.digitizingvietnam.com/vi/our-collections/dai-viet-su-ky-toan-thu/ban-ky-thuc-luc",
+  "total_claims": 24,
+  "overall_accuracy": 1.0,
+  "macro_f1": 1.0,
+  "citation_accuracy": 1.0,
+  "unsupported_rejection_rate": 1.0,
+  "top1_folio_recall": 1.0,
+  "top2_folio_recall": 1.0,
+  "top3_folio_recall": 1.0,
+  "confusion_matrix": {
+    "labels": [
+      "SUPPORTED",
+      "CONTRADICTED",
+      "INSUFFICIENT_EVIDENCE"
+    ],
+    "matrix": [
+      [
+        8,
+        0,
+        0
+      ],
+      [
+        0,
+        8,
+        0
+      ],
+      [
+        0,
+        0,
+        8
+      ]
+    ]
+  },
+  "per_class_metrics": {
+    "SUPPORTED": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 8
+    },
+    "CONTRADICTED": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 8
+    },
+    "INSUFFICIENT_EVIDENCE": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 8
+    }
+  },
+  "claims_results": [
+    {
+      "claim_id": "auth_claim_001",
+      "claim": "Năm Canh Thìn (1460), sau khi dẹp loạn Nghi Dân, triều thần tôn lập hoàng tử Tư Thành lên ngôi tại điện Tường Quang, lấy niên hiệu là Quang Thuận.",
+      "expected_label": "SUPPORTED",
+      "predicted_label": "SUPPORTED",
+      "is_correct": true,
+      "expected_folio": "XII_1a_1b",
+      "retrieved_folios": [
+        "XII_1a_1b",
+        "XII_52a_53b",
+        "XIII_45a_46b"
+      ],
+      "confidence": 0.87,
+      "explanation": "Khẳng định được chứng thực bởi tài liệu 'Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục (Quyển XII & XIII)', Trang 12 (Mã đoạn: chunk_dvsktt_XII_1a_1b): \"Mùa hạ, tháng 6, ngày mồng 6 năm Canh Thìn (1460), sau khi bọn đại nghịch Đỗ Bí, Lê Ngang mưu trừ nghịch đảng Nghi Dân, đại thần Thái bảo Nguyễn Xí, Thái phó Đi...\"",
+      "has_valid_citation": true
+    },
+    {
+      "claim_id": "auth_claim_002",
+      "claim": "Hoàng đế Lê Thánh Tông bãi bỏ chức Tể tướng cùng các phẩm hàm Tam công, Tam thiếu nhằm tập trung quyền lực tối cao về tay Hoàng đế.",
+      "expected_label": "SUPPORTED",
+      "predicted_label": "SUPPORTED",
+      "is_correct": true,
+      "expected_folio": "XII_31b_33a",
+      "retrieved_folios": [
+        "XII_31b_33a",
+        "XII_1a_1b",
+        "XIII_61a_62b"
+      ],
+      "confidence": 0.68,
+      "explanation": "Khẳng định được chứng thực bởi tài liệu 'Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục (Quyển XII & XIII)', Trang 12 (Mã đoạn: chunk_dvsktt_XII_31b_33a): \"Triều đình chính thức bãi bỏ chức vị Tể tướng cùng các phẩm hàm Tam công, Tam thiếu của tiền triều nhằm tập trung toàn bộ quyền lực tối cao về tay Hoàng đế.\"",
+      "has_valid_citation": true
+    },
+    {
+      "claim_id": "auth_claim_003",
+      "claim": "Lê Thánh Tông tổ chức chính quyền địa phương thành các Đạo thừa tuyên do Tam ty (Đô ty, Thừa ty, Hiến ty) cùng nhau cai quản.",
+      "expected_label": "SUPPORTED",
+      "predicted_label": "SUPPORTED",
+      "is_correct": true,
+      "expected_folio": "XII_31b_33a",
+      "retrieved_folios": [
+        "XII_31b_33a",
+        "XIII_45a_46b",
+        "XII_65b_68a"
+      ],
+      "confidence": 0.74,
+      "explanation": "Khẳng định được chứng thực bởi tài liệu 'Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục (Quyển XII & XIII)', Trang 12 (Mã đoạn: chunk_dvsktt_XII_31b_33a): \"Ở địa phương, chia cả nước thành 12 Đạo thừa tuyên (đến năm 1471 lập thêm đạo thứ 13 là Quảng Nam), mỗi đạo đặt Tam ty cai quản độc lập gồm Đô ty coi việc quân ...\"",
+      "has_valid_citation": true
+    },
+    {
+      "claim_id": "auth_claim_004",
+      "claim": "Năm 1467, triều đình Lê Thánh Tông đặt chức quan Hà đê sứ và Khuyến nông sứ để chăm lo việc đắp đê ngăn lũ và mở mang canh tác.",
+      "expected_label": "SUPPORTED",
+      "predicted_label": "SUPPORTED",
+      "is_correct": true,
+      "expected_folio": "XII_52a_53b",
+      "retrieved_folios": [
+        "XII_52a_53b",
+        "XII_31b_33a",
+        "XIII_45a_46b"
+      ],
+      "confidence": 0.87,
+      "explanation": "Khẳng định được chứng thực bởi tài liệu 'Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục (Quyển XII & XIII)', Trang 12 (Mã đoạn: chunk_dvsktt_XII_52a_53b): \"Năm Đinh Hợi (1467), nhà vua hạ lệnh đặt chức Hà đê quan (Hà đê sứ) và Khuyến nông sứ tại các đạo thừa tuyên ven sông Hồng và sông Mã.\"",
+      "has_valid_citation": true
+    },
+    {
+      "claim_id": "auth_claim_005",
+      "claim": "Năm 1471, Lê Thánh Tông đích thân chỉ huy đại quân Nam chinh, đánh bại vua Chiêm Thành Trà Toàn và lập nên đạo Quảng Nam.",
+      "expected_label": "SUPPORTED",
+      "predicted_label": "SUPPORTED",
+      "is_correct": true,
+      "expected_folio": "XII_65b_68a",
+      "retrieved_folios": [
+        "XII_65b_68a",
+        "XII_31b_33a",
+        "XIII_45a_46b"
+      ],
+      "confidence": 0.79,
+      "explanation": "Khẳng định được chứng thực bởi tài liệu 'Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục (Quyển XII & XIII)', Trang 12 (Mã đoạn: chunk_dvsktt_XII_65b_68a): \"Tháng 11 năm Canh Dần, vua Lê Thánh Tông ban bố chiếu thân chinh, đích thân thống lĩnh 26 vạn thủy bộ đại quân tiến về phương Nam.\"",
+      "has_valid_citation": true
+    },
+    {
+      "claim_id": "auth_claim_006",
+      "claim": "Năm 1473, Lê Thánh Tông căn dặn sứ thần: Một thước núi, một tấc sông của ta, lẽ nào lại nên tự tiện vứt bỏ, ngươi phải kiên quyết tranh biện.",
+      "expected_label": "SUPPORTED",
+      "predicted_label": "SUPPORTED",
+      "is_correct": true,
+      "expected_folio": "XII_82b",
+      "retrieved_folios": [
+        "XII_82b",
+        "XIII_45a_46b",
+        "XII_1a_1b"
+      ],
+      "confidence": 0.97,
+      "explanation": "Khẳng định được chứng thực bởi tài liệu 'Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục (Quyển XII & XIII)', Trang 12 (Mã đoạn: chunk_dvsktt_XII_82b): \"Trước lúc lên đường, Hoàng đế Lê Thánh Tông nghiêm khắc truyền khẩu dụ: 'Một thước núi, một tấc sông của ta, lẽ nào lại nên tự tiện vứt bỏ?\"",
+      "has_valid_citation": true
+    },
+    {
+      "claim_id": "auth_claim_007",
+      "claim": "Năm Giáp Thìn (1484), Lê Thánh Tông cho dựng bia tiến sĩ tại Văn Miếu, trong đó Thân Nhân Trung soạn câu 'Hiền tài là nguyên khí của quốc gia'.",
+      "expected_label": "SUPPORTED",
+      "predicted_label": "SUPPORTED",
+      "is_correct": true,
+      "expected_folio": "XIII_24a_25b",
+      "retrieved_folios": [
+        "XIII_24a_25b",
+        "XIII_61a_62b",
+        "XIII_74a_75b"
+      ],
+      "confidence": 0.85,
+      "explanation": "Khẳng định được chứng thực bởi tài liệu 'Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục (Quyển XII & XIII)', Trang 13 (Mã đoạn: chunk_dvsktt_XIII_24a_25b): \"Mùa xuân tháng 3 năm Giáp Thìn (1484), vua Lê Thánh Tông ban chỉ dụ cho dựng bia đá đề danh tiến sĩ tại Văn Miếu - Quốc Tử Giám Hà Nội, khắc tên các bậc đỗ đại ...\"",
+      "has_valid_citation": true
+    },
+    {
+      "claim_id": "auth_claim_008",
+      "claim": "Bộ luật Hồng Đức dưới triều Lê Thánh Tông có quy định bảo vệ quyền thừa kế tài sản hương hỏa của người phụ nữ.",
+      "expected_label": "SUPPORTED",
+      "predicted_label": "SUPPORTED",
+      "is_correct": true,
+      "expected_folio": "XIII_74a_75b",
+      "retrieved_folios": [
+        "XIII_74a_75b",
+        "XII_31b_33a",
+        "XIII_45a_46b"
+      ],
+      "confidence": 0.9,
+      "explanation": "Khẳng định được chứng thực bởi tài liệu 'Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục (Quyển XII & XIII)', Trang 13 (Mã đoạn: chunk_dvsktt_XIII_74a_75b): \"Bộ luật Hồng Đức không chỉ củng cố trật tự vương triều mà còn mang tư tưởng nhân văn sâu sắc: bảo vệ quyền lợi của phụ nữ trong việc thừa kế tài sản hương hỏa c...\"",
+      "has_valid_citation": true
+    },
+    {
+      "claim_id": "auth_claim_009",
+      "claim": "Lê Thánh Tông lên ngôi hoàng đế vào năm 1520 sau khi đánh bại nhà Mạc tại Thăng Long.",
+      "expected_label": "CONTRADICTED",
+      "predicted_label": "CONTRADICTED",
+      "is_correct": true,
+      "expected_folio": "XII_1a_1b",
+      "retrieved_folios": [
+        "XII_1a_1b",
+        "XII_65b_68a",
+        "XIII_45a_46b"
+      ],
+      "confidence": 0.95,
+      "explanation": "Mâu thuẫn về mốc thời gian: Khẳng định nêu năm 1520, nhưng tài liệu lịch sử 'Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục (Quyển XII & XIII)' (Trang 12, đoạn chunk_dvsktt_XII_1a_1b) ghi nhận mốc thời gian là 1460, 1470, 1471, 1490.",
+      "has_valid_citation": true
+    },
+    {
+      "claim_id": "auth_claim_010",
+      "claim": "Lê Thánh Tông đã tăng cường quyền lực tối cao cho chức Tể tướng để trực tiếp chỉ huy toàn bộ Lục Bộ.",
+      "expected_label": "CONTRADICTED",
+      "predicted_label": "CONTRADICTED",
+      "is_correct": true,
+      "expected_folio": "XII_31b_33a",
+      "retrieved_folios": [
+        "XII_31b_33a",
+        "XII_65b_68a",
+        "XIII_74a_75b"
+      ],
+      "confidence": 0.95,
+      "explanation": "Khẳng định có mâu thuẫn trực tiếp với nguồn tư liệu: Khẳng định nêu luận điểm trái ngược, trong khi văn bản gốc ghi rõ 'bãi bỏ' (Nguồn: Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục (Quyển XII & XIII), Trang 12).",
+      "has_valid_citation": true
+    },
+    {
+      "claim_id": "auth_claim_011",
+      "claim": "Bộ luật Hồng Đức quy định tước đoạt toàn bộ tài sản riêng và cấm phụ nữ có quyền thừa kế hương hỏa trong gia đình.",
+      "expected_label": "CONTRADICTED",
+      "predicted_label": "CONTRADICTED",
+      "is_correct": true,
+      "expected_folio": "XIII_74a_75b",
+      "retrieved_folios": [
+        "XIII_74a_75b",
+        "XIII_45a_46b",
+        "XII_31b_33a"
+      ],
+      "confidence": 0.95,
+      "explanation": "Khẳng định có mâu thuẫn trực tiếp với nguồn tư liệu: Khẳng định nêu luận điểm trái ngược, trong khi văn bản gốc ghi rõ 'bảo vệ' (Nguồn: Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục (Quyển XII & XIII), Trang 13).",
+      "has_valid_citation": true
+    },
+    {
+      "claim_id": "auth_claim_012",
+      "claim": "Năm 1484, vua Lê Thánh Tông ra lệnh đập phá và tiêu hủy toàn bộ các bia tiến sĩ tại Văn Miếu - Quốc Tử Giám.",
+      "expected_label": "CONTRADICTED",
+      "predicted_label": "CONTRADICTED",
+      "is_correct": true,
+      "expected_folio": "XIII_24a_25b",
+      "retrieved_folios": [
+        "XIII_24a_25b",
+        "XII_65b_68a",
+        "XIII_45a_46b"
+      ],
+      "confidence": 0.95,
+      "explanation": "Khẳng định có mâu thuẫn trực tiếp với nguồn tư liệu: Khẳng định nêu luận điểm trái ngược, trong khi văn bản gốc ghi rõ 'dựng bia' (Nguồn: Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục (Quyển XII & XIII), Trang 13).",
+      "has_valid_citation": true
+    },
+    {
+      "claim_id": "auth_claim_013",
+      "claim": "Chiến dịch Nam chinh năm 1471 của Lê Thánh Tông kết thúc trong thất bại nặng nề và quân Đại Việt bị bắt sống hoàn toàn.",
+      "expected_label": "CONTRADICTED",
+      "predicted_label": "CONTRADICTED",
+      "is_correct": true,
+      "expected_folio": "XII_65b_68a",
+      "retrieved_folios": [
+        "XII_65b_68a",
+        "XIII_45a_46b",
+        "XII_31b_33a"
+      ],
+      "confidence": 0.95,
+      "explanation": "Khẳng định có mâu thuẫn trực tiếp với nguồn tư liệu: Khẳng định nêu luận điểm trái ngược, trong khi văn bản gốc ghi rõ 'đại thắng' (Nguồn: Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục (Quyển XII & XIII), Trang 12).",
+      "has_valid_citation": true
+    },
+    {
+      "claim_id": "auth_claim_014",
+      "claim": "Lê Thánh Tông chủ trương cắt đất biên giới nhượng cho ngoại bang và dặn đình thần không cần tranh biện từng thước núi tấc sông.",
+      "expected_label": "CONTRADICTED",
+      "predicted_label": "CONTRADICTED",
+      "is_correct": true,
+      "expected_folio": "XII_82b",
+      "retrieved_folios": [
+        "XII_82b",
+        "XIII_45a_46b",
+        "XIII_24a_25b"
+      ],
+      "confidence": 0.95,
+      "explanation": "Khẳng định có mâu thuẫn trực tiếp với nguồn tư liệu: Khẳng định nêu luận điểm trái ngược, trong khi văn bản gốc ghi rõ 'kiên quyết tranh biện' (Nguồn: Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục (Quyển XII & XIII), Trang 12).",
+      "has_valid_citation": true
+    },
+    {
+      "claim_id": "auth_claim_015",
+      "claim": "Năm 1490, triều đình Hồng Đức hạ lệnh nghiêm cấm vẽ bản đồ và thiêu hủy mọi tư liệu địa lý lãnh thổ.",
+      "expected_label": "CONTRADICTED",
+      "predicted_label": "CONTRADICTED",
+      "is_correct": true,
+      "expected_folio": "XIII_45a_46b",
+      "retrieved_folios": [
+        "XIII_45a_46b",
+        "XIII_74a_75b",
+        "XII_1a_1b"
+      ],
+      "confidence": 0.95,
+      "explanation": "Khẳng định có mâu thuẫn trực tiếp với nguồn tư liệu: Khẳng định nêu luận điểm trái ngược, trong khi văn bản gốc ghi rõ 'bản đồ' (Nguồn: Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục (Quyển XII & XIII), Trang 13).",
+      "has_valid_citation": true
+    },
+    {
+      "claim_id": "auth_claim_016",
+      "claim": "Hội Tao Đàn Nhị Thập Bát Tú do vua Chiêm Thành Trà Toàn sáng lập tại kinh đô Thăng Long vào năm 1495.",
+      "expected_label": "CONTRADICTED",
+      "predicted_label": "CONTRADICTED",
+      "is_correct": true,
+      "expected_folio": "XIII_61a_62b",
+      "retrieved_folios": [
+        "XIII_61a_62b",
+        "XII_65b_68a",
+        "XIII_45a_46b"
+      ],
+      "confidence": 0.95,
+      "explanation": "Khẳng định có mâu thuẫn trực tiếp với nguồn tư liệu: Khẳng định nêu luận điểm trái ngược, trong khi văn bản gốc ghi rõ 'sáng lập' (Nguồn: Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục (Quyển XII & XIII), Trang 13).",
+      "has_valid_citation": true
+    },
+    {
+      "claim_id": "auth_claim_017",
+      "claim": "Lê Thánh Tông từng cử sứ đoàn ngoại giao đi thuyền vượt Đại Tây Dương sang Luân Đôn diện kiến Nữ hoàng Elizabeth nước Anh.",
+      "expected_label": "INSUFFICIENT_EVIDENCE",
+      "predicted_label": "INSUFFICIENT_EVIDENCE",
+      "is_correct": true,
+      "expected_folio": null,
+      "retrieved_folios": [
+        "XII_82b",
+        "XII_1a_1b",
+        "XIII_45a_46b"
+      ],
+      "confidence": 0.95,
+      "explanation": "Tài liệu hiện có không chứa đủ thông tin để chứng thực nội dung này. Khái niệm/thực thể 'elizabeth' hoàn toàn không xuất hiện trong các nguồn văn bản lịch sử được tham chiếu.",
+      "has_valid_citation": true
+    },
+    {
+      "claim_id": "auth_claim_018",
+      "claim": "Hải quân của Lê Thánh Tông được trang bị tàu tuần tra bọc thép chạy bằng động cơ hơi nước và súng trường bắn tỉa liên thanh.",
+      "expected_label": "INSUFFICIENT_EVIDENCE",
+      "predicted_label": "INSUFFICIENT_EVIDENCE",
+      "is_correct": true,
+      "expected_folio": null,
+      "retrieved_folios": [
+        "XIII_45a_46b",
+        "XII_82b",
+        "XII_31b_33a"
+      ],
+      "confidence": 0.95,
+      "explanation": "Tài liệu hiện có không chứa đủ thông tin để chứng thực nội dung này. Khái niệm/thực thể 'hơi nước' hoàn toàn không xuất hiện trong các nguồn văn bản lịch sử được tham chiếu.",
+      "has_valid_citation": true
+    },
+    {
+      "claim_id": "auth_claim_019",
+      "claim": "Hoàng đế Lê Thánh Tông từng theo học triết học phương Tây tại Đại học Sorbonne ở Paris trước khi hồi hương đăng cơ.",
+      "expected_label": "INSUFFICIENT_EVIDENCE",
+      "predicted_label": "INSUFFICIENT_EVIDENCE",
+      "is_correct": true,
+      "expected_folio": null,
+      "retrieved_folios": [
+        "XIII_61a_62b",
+        "XII_82b",
+        "XII_1a_1b"
+      ],
+      "confidence": 0.95,
+      "explanation": "Tài liệu hiện có không chứa đủ thông tin để chứng thực nội dung này. Khái niệm/thực thể 'sorbonne' hoàn toàn không xuất hiện trong các nguồn văn bản lịch sử được tham chiếu.",
+      "has_valid_citation": true
+    },
+    {
+      "claim_id": "auth_claim_020",
+      "claim": "Vua Lê Thánh Tông đã cho xây dựng tuyến đường sắt nối liền Thăng Long và Quảng Nam để vận chuyển binh sĩ.",
+      "expected_label": "INSUFFICIENT_EVIDENCE",
+      "predicted_label": "INSUFFICIENT_EVIDENCE",
+      "is_correct": true,
+      "expected_folio": null,
+      "retrieved_folios": [
+        "XII_65b_68a",
+        "XIII_45a_46b",
+        "XII_31b_33a"
+      ],
+      "confidence": 0.95,
+      "explanation": "Tài liệu hiện có không chứa đủ thông tin để chứng thực nội dung này. Khái niệm/thực thể 'đường sắt' hoàn toàn không xuất hiện trong các nguồn văn bản lịch sử được tham chiếu.",
+      "has_valid_citation": true
+    },
+    {
+      "claim_id": "auth_claim_021",
+      "claim": "Triều đình Hồng Đức đã ký kết hiệp ước liên minh quân sự với Đế quốc Ottoman nhằm phòng thủ trước quân Mông Cổ.",
+      "expected_label": "INSUFFICIENT_EVIDENCE",
+      "predicted_label": "INSUFFICIENT_EVIDENCE",
+      "is_correct": true,
+      "expected_folio": null,
+      "retrieved_folios": [
+        "XIII_74a_75b",
+        "XII_65b_68a",
+        "XIII_45a_46b"
+      ],
+      "confidence": 0.95,
+      "explanation": "Tài liệu hiện có không chứa đủ thông tin để chứng thực nội dung này. Khái niệm/thực thể 'ottoman' hoàn toàn không xuất hiện trong các nguồn văn bản lịch sử được tham chiếu.",
+      "has_valid_citation": true
+    },
+    {
+      "claim_id": "auth_claim_022",
+      "claim": "Lê Thánh Tông sáng tác nhiều bài thơ tình bằng tiếng Latinh gửi tặng các giáo sĩ Dòng Tên Bồ Đào Nha.",
+      "expected_label": "INSUFFICIENT_EVIDENCE",
+      "predicted_label": "INSUFFICIENT_EVIDENCE",
+      "is_correct": true,
+      "expected_folio": null,
+      "retrieved_folios": [
+        "XIII_24a_25b",
+        "XIII_45a_46b",
+        "XIII_61a_62b"
+      ],
+      "confidence": 0.95,
+      "explanation": "Tài liệu hiện có không chứa đủ thông tin để chứng thực nội dung này. Khái niệm/thực thể 'latinh' hoàn toàn không xuất hiện trong các nguồn văn bản lịch sử được tham chiếu.",
+      "has_valid_citation": true
+    },
+    {
+      "claim_id": "auth_claim_023",
+      "claim": "Nhà vua đã chỉ định một thương nhân người Hà Lan làm Thượng thư Bộ Lễ trong triều đình Thăng Long.",
+      "expected_label": "INSUFFICIENT_EVIDENCE",
+      "predicted_label": "INSUFFICIENT_EVIDENCE",
+      "is_correct": true,
+      "expected_folio": null,
+      "retrieved_folios": [
+        "XIII_74a_75b",
+        "XII_82b",
+        "XII_65b_68a"
+      ],
+      "confidence": 0.95,
+      "explanation": "Tài liệu hiện có không chứa đủ thông tin để chứng thực nội dung này. Khái niệm/thực thể 'hà lan' hoàn toàn không xuất hiện trong các nguồn văn bản lịch sử được tham chiếu.",
+      "has_valid_citation": true
+    },
+    {
+      "claim_id": "auth_claim_024",
+      "claim": "Lê Thánh Tông đã ra lệnh phóng khinh khí cầu thăm dò khí tượng trên bầu trời Thăng Long vào năm 1480.",
+      "expected_label": "INSUFFICIENT_EVIDENCE",
+      "predicted_label": "INSUFFICIENT_EVIDENCE",
+      "is_correct": true,
+      "expected_folio": null,
+      "retrieved_folios": [
+        "XIII_24a_25b",
+        "XII_65b_68a",
+        "XIII_45a_46b"
+      ],
+      "confidence": 0.95,
+      "explanation": "Tài liệu hiện có không chứa đủ thông tin để chứng thực nội dung này. Khái niệm/thực thể 'khinh khí cầu' hoàn toàn không xuất hiện trong các nguồn văn bản lịch sử được tham chiếu.",
+      "has_valid_citation": true
+    }
+  ]
+}

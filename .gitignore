@@ -27,5 +27,16 @@ data/uploads/*
 !data/uploads/.gitkeep
 data/exports/*
 !data/exports/.gitkeep
+backend/data/uploads/*
+!backend/data/uploads/.gitkeep
+backend/data/exports/*
+!backend/data/exports/.gitkeep
+backend/data/*.db
+backend/data/*.sqlite
+!backend/data/.gitkeep
+backend/demo_output/
+demo_output/*.mp4
+*.mp4
 .env
 .env.local
+

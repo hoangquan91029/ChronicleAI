@@ -1,0 +1,242 @@
+[
+  {
+    "claim_id": "LTT-SUP-01",
+    "claim": "Năm Canh Thìn (1460), sau biến loạn Nghi Dân, hoàng tử Lê Tư Thành được các đại thần tôn lên ngôi hoàng đế, lấy niên hiệu Quang Thuận sau đổi thành Hồng Đức.",
+    "expected_label": "SUPPORTED",
+    "source_id": "DVSKTT-BKTL-Q12",
+    "source_title": "Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục — Quyển XII",
+    "folio_reference": "DVSKTT_ban_thuc_XII_1a",
+    "page": 1,
+    "evaluation_notes": "Ground-truth historical event: Accession of Emperor Lê Thánh Tông in 1460."
+  },
+  {
+    "claim_id": "LTT-SUP-02",
+    "claim": "Lê Thánh Tông bãi bỏ các chức vị Tể tướng, Tam công, Tam thiếu nhằm tập trung quyền lực tối cao vào tay Hoàng đế.",
+    "expected_label": "SUPPORTED",
+    "source_id": "DVSKTT-BKTL-Q12",
+    "source_title": "Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục — Quyển XII",
+    "folio_reference": "DVSKTT_ban_thuc_XII_14b",
+    "page": 1,
+    "evaluation_notes": "Ground-truth administrative reform: Abolition of Grand Chancellor (Tể Tướng) to prevent ministerial monopoly."
+  },
+  {
+    "claim_id": "LTT-SUP-03",
+    "claim": "Triều đình Lê Thánh Tông tái cấu trúc bộ máy trung ương thành Lục Bộ trực tiếp dưới sự chỉ đạo của vua, được giám sát bởi Lục Khoa.",
+    "expected_label": "SUPPORTED",
+    "source_id": "DVSKTT-BKTL-Q12",
+    "source_title": "Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục — Quyển XII",
+    "folio_reference": "DVSKTT_ban_thuc_XII_14b",
+    "page": 1,
+    "evaluation_notes": "Ground-truth structural reform: Six Ministries (Lục Bộ) and Six Oversight Sections (Lục Khoa)."
+  },
+  {
+    "claim_id": "LTT-SUP-04",
+    "claim": "Bộ luật Hồng Đức (Quốc Triều Hình Luật) bảo vệ quyền lợi phụ nữ, cho phép phụ nữ thừa kế hương hỏa và giữ tài sản riêng khi ly hôn.",
+    "expected_label": "SUPPORTED",
+    "source_id": "DVSKTT-BKTL-Q12",
+    "source_title": "Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục — Quyển XII",
+    "folio_reference": "DVSKTT_ban_thuc_XII_28a",
+    "page": 2,
+    "evaluation_notes": "Ground-truth legal history: Women inheritance rights in Quốc Triều Hình Luật."
+  },
+  {
+    "claim_id": "LTT-SUP-05",
+    "claim": "Lê Thánh Tông đặt ra chức quan Hà đê sứ chuyên trách đắp đê ngăn lũ sông Hồng và Khuyến nông sứ để thúc đẩy canh tác.",
+    "expected_label": "SUPPORTED",
+    "source_id": "DVSKTT-BKTL-Q12",
+    "source_title": "Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục — Quyển XII",
+    "folio_reference": "DVSKTT_ban_thuc_XII_31a",
+    "page": 2,
+    "evaluation_notes": "Ground-truth agricultural infrastructure: Dike and farming commissioners."
+  },
+  {
+    "claim_id": "LTT-SUP-06",
+    "claim": "Năm Giáp Thìn (1484), Lê Thánh Tông ra lệnh dựng bia đá khắc tên các vị đỗ Tiến sĩ tại Văn Miếu - Quốc Tử Giám.",
+    "expected_label": "SUPPORTED",
+    "source_id": "DVSKTT-BKTL-Q13",
+    "source_title": "Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục — Quyển XIII",
+    "folio_reference": "DVSKTT_ban_thuc_XIII_23b",
+    "page": 3,
+    "evaluation_notes": "Ground-truth education policy: Erection of doctor stelae in 1484 with Thân Nhân Trung inscription."
+  },
+  {
+    "claim_id": "LTT-SUP-07",
+    "claim": "Năm 1471, Lê Thánh Tông đích thân thống lĩnh 20 vạn quân tiến hành chiến dịch Nam chinh đánh bại vua Chiêm Thành Trà Toàn, lập nên đạo Quảng Nam.",
+    "expected_label": "SUPPORTED",
+    "source_id": "DVSKTT-BKTL-Q12",
+    "source_title": "Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục — Quyển XII",
+    "folio_reference": "DVSKTT_ban_thuc_XII_51b",
+    "page": 5,
+    "evaluation_notes": "Ground-truth military campaign: Southern expedition 1471 and creation of the 13th circuit (Quảng Nam)."
+  },
+  {
+    "claim_id": "LTT-SUP-08",
+    "claim": "Năm 1473, Lê Thánh Tông truyền lời căn dặn: Một thước núi, một tấc sông của ta, lẽ nào lại tự tiện vứt bỏ? Ngươi phải kiên quyết tranh biện, chớ cho họ lấn dần.",
+    "expected_label": "SUPPORTED",
+    "source_id": "DVSKTT-BKTL-Q12",
+    "source_title": "Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục — Quyển XII",
+    "folio_reference": "DVSKTT_ban_thuc_XII_62a",
+    "page": 5,
+    "evaluation_notes": "Ground-truth sovereign territorial oath recorded in Đại Việt Sử Ký Toàn Thư."
+  },
+  {
+    "claim_id": "LTT-CON-01",
+    "claim": "Lê Thánh Tông lên ngôi hoàng đế vào năm 1520 sau khi lật đổ vương triều nhà Mạc tại Thăng Long.",
+    "expected_label": "CONTRADICTED",
+    "source_id": "DVSKTT-BKTL-Q12",
+    "source_title": "Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục — Quyển XII",
+    "folio_reference": "DVSKTT_ban_thuc_XII_1a",
+    "page": 1,
+    "evaluation_notes": "Adversarial chronological clash: Asserts accession in 1520 (actual: 1460); Mạc dynasty was established in 1527."
+  },
+  {
+    "claim_id": "LTT-CON-02",
+    "claim": "Lê Thánh Tông đã tăng cường quyền lực tối cao cho chức Tể tướng để trực tiếp chỉ huy toàn bộ Lục Bộ.",
+    "expected_label": "CONTRADICTED",
+    "source_id": "DVSKTT-BKTL-Q12",
+    "source_title": "Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục — Quyển XII",
+    "folio_reference": "DVSKTT_ban_thuc_XII_14b",
+    "page": 1,
+    "evaluation_notes": "Adversarial role clash: Source explicitly records he abolished the office of Tể tướng."
+  },
+  {
+    "claim_id": "LTT-CON-03",
+    "claim": "Bộ luật Hồng Đức quy định tước đoạt toàn bộ tài sản riêng và cấm phụ nữ có quyền thừa kế hương hỏa trong gia đình.",
+    "expected_label": "CONTRADICTED",
+    "source_id": "DVSKTT-BKTL-Q12",
+    "source_title": "Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục — Quyển XII",
+    "folio_reference": "DVSKTT_ban_thuc_XII_28a",
+    "page": 2,
+    "evaluation_notes": "Adversarial legal clash: Source records progressive protection of female inheritance."
+  },
+  {
+    "claim_id": "LTT-CON-04",
+    "claim": "Năm 1484, vua Lê Thánh Tông ra lệnh đập phá và tiêu hủy toàn bộ các bia tiến sĩ tại Văn Miếu - Quốc Tử Giám.",
+    "expected_label": "CONTRADICTED",
+    "source_id": "DVSKTT-BKTL-Q13",
+    "source_title": "Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục — Quyển XIII",
+    "folio_reference": "DVSKTT_ban_thuc_XIII_23b",
+    "page": 3,
+    "evaluation_notes": "Adversarial polarity clash: Asserts destruction of stelae; source records their erection."
+  },
+  {
+    "claim_id": "LTT-CON-05",
+    "claim": "Chiến dịch Nam chinh năm 1471 của Lê Thánh Tông kết thúc trong thất bại nặng nề và quân Đại Việt bị bắt sống hoàn toàn.",
+    "expected_label": "CONTRADICTED",
+    "source_id": "DVSKTT-BKTL-Q12",
+    "source_title": "Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục — Quyển XII",
+    "folio_reference": "DVSKTT_ban_thuc_XII_51b",
+    "page": 5,
+    "evaluation_notes": "Adversarial outcome clash: Asserts military defeat; source records decisive victory."
+  },
+  {
+    "claim_id": "LTT-CON-06",
+    "claim": "Lê Thánh Tông chủ trương cắt đất biên giới nhượng cho ngoại bang và dặn đình thần không cần tranh biện từng thước núi tấc sông.",
+    "expected_label": "CONTRADICTED",
+    "source_id": "DVSKTT-BKTL-Q12",
+    "source_title": "Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục — Quyển XII",
+    "folio_reference": "DVSKTT_ban_thuc_XII_62a",
+    "page": 5,
+    "evaluation_notes": "Adversarial oath clash: Direct inversion of sovereign territorial defense decree."
+  },
+  {
+    "claim_id": "LTT-CON-07",
+    "claim": "Năm 1490, triều đình Hồng Đức hạ lệnh nghiêm cấm vẽ bản đồ và thiêu hủy mọi tư liệu địa lý lãnh thổ Đại Việt.",
+    "expected_label": "CONTRADICTED",
+    "source_id": "DVSKTT-BKTL-Q13",
+    "source_title": "Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục — Quyển XIII",
+    "folio_reference": "DVSKTT_ban_thuc_XIII_48a",
+    "page": 4,
+    "evaluation_notes": "Adversarial cultural clash: Asserts map prohibition; source records completion of Hồng Đức National Atlas in 1490."
+  },
+  {
+    "claim_id": "LTT-CON-08",
+    "claim": "Hội Tao Đàn Nhị Thập Bát Tú do vua Chiêm Thành Trà Toàn sáng lập tại kinh đô Thăng Long năm 1495.",
+    "expected_label": "CONTRADICTED",
+    "source_id": "DVSKTT-BKTL-Q13",
+    "source_title": "Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục — Quyển XIII",
+    "folio_reference": "DVSKTT_ban_thuc_XIII_64b",
+    "page": 4,
+    "evaluation_notes": "Adversarial founder clash: Founded by Lê Thánh Tông, not the captured Champa king Trà Toàn."
+  },
+  {
+    "claim_id": "LTT-INS-01",
+    "claim": "Lê Thánh Tông từng cử sứ đoàn ngoại giao đi thuyền vượt đại dương sang Luân Đôn diện kiến Nữ hoàng Elizabeth I của nước Anh.",
+    "expected_label": "INSUFFICIENT_EVIDENCE",
+    "source_id": "DVSKTT-BKTL-Q12",
+    "source_title": "Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục",
+    "folio_reference": "N/A",
+    "page": 0,
+    "evaluation_notes": "Anachronistic and geographically disconnected claim: Elizabeth I reigned 1558-1603."
+  },
+  {
+    "claim_id": "LTT-INS-02",
+    "claim": "Hải quân của Lê Thánh Tông được trang bị tàu tuần tra bọc thép chạy bằng động cơ hơi nước và súng trường bắn tỉa liên thanh.",
+    "expected_label": "INSUFFICIENT_EVIDENCE",
+    "source_id": "DVSKTT-BKTL-Q12",
+    "source_title": "Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục",
+    "folio_reference": "N/A",
+    "page": 0,
+    "evaluation_notes": "Technological anachronism: 19th-century industrial technologies absent from medieval annals."
+  },
+  {
+    "claim_id": "LTT-INS-03",
+    "claim": "Hoàng đế Lê Thánh Tông từng theo học triết học phương Tây tại Đại học Sorbonne ở Paris trước khi hồi hương đăng cơ.",
+    "expected_label": "INSUFFICIENT_EVIDENCE",
+    "source_id": "DVSKTT-BKTL-Q12",
+    "source_title": "Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục",
+    "folio_reference": "N/A",
+    "page": 0,
+    "evaluation_notes": "Fabricated biographical assertion: No records of Western study in dynastic archives."
+  },
+  {
+    "claim_id": "LTT-INS-04",
+    "claim": "Vua Lê Thánh Tông đã cho xây dựng tuyến đường sắt nối liền Thăng Long và Quảng Nam để vận chuyển binh sĩ.",
+    "expected_label": "INSUFFICIENT_EVIDENCE",
+    "source_id": "DVSKTT-BKTL-Q12",
+    "source_title": "Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục",
+    "folio_reference": "N/A",
+    "page": 0,
+    "evaluation_notes": "Fabricated infrastructure claim: Railways were invented centuries later."
+  },
+  {
+    "claim_id": "LTT-INS-05",
+    "claim": "Triều đình Hồng Đức đã ký kết hiệp ước liên minh quân sự với Đế quốc Ottoman nhằm phòng thủ trước quân Mông Cổ.",
+    "expected_label": "INSUFFICIENT_EVIDENCE",
+    "source_id": "DVSKTT-BKTL-Q12",
+    "source_title": "Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục",
+    "folio_reference": "N/A",
+    "page": 0,
+    "evaluation_notes": "Geopolitical fabrication: No diplomatic or military treaties between Dai Viet and the Ottoman Empire."
+  },
+  {
+    "claim_id": "LTT-INS-06",
+    "claim": "Lê Thánh Tông sáng tác nhiều bài thơ tình bằng tiếng Latinh gửi tặng các giáo sĩ dòng Tên Bồ Đào Nha.",
+    "expected_label": "INSUFFICIENT_EVIDENCE",
+    "source_id": "DVSKTT-BKTL-Q13",
+    "source_title": "Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục",
+    "folio_reference": "N/A",
+    "page": 0,
+    "evaluation_notes": "Fabricated literary claim: Emperor composed in Classical Chinese and Chữ Nôm, not Latin."
+  },
+  {
+    "claim_id": "LTT-INS-07",
+    "claim": "Nhà vua đã chỉ định một thương nhân người Hà Lan làm Thượng thư Bộ Lễ trong triều đình Thăng Long.",
+    "expected_label": "INSUFFICIENT_EVIDENCE",
+    "source_id": "DVSKTT-BKTL-Q12",
+    "source_title": "Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục",
+    "folio_reference": "N/A",
+    "page": 0,
+    "evaluation_notes": "Fabricated court appointment: Dutch traders did not reach Tonkin until the 17th century."
+  },
+  {
+    "claim_id": "LTT-INS-08",
+    "claim": "Lê Thánh Tông đã ra lệnh phóng khinh khí cầu thăm dò khí tượng trên bầu trời Thăng Long vào năm 1480.",
+    "expected_label": "INSUFFICIENT_EVIDENCE",
+    "source_id": "DVSKTT-BKTL-Q12",
+    "source_title": "Đại Việt Sử Ký Toàn Thư — Bản Kỷ Thực Lục",
+    "folio_reference": "N/A",
+    "page": 0,
+    "evaluation_notes": "Fabricated technological claim: Hot air ballooning did not exist in 15th-century Dai Viet."
+  }
+]
